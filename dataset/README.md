@@ -1,5 +1,5 @@
+[Importing Code File](data_import.py)
 # Databases Used:
-[Import Code](data_import.py)
 ## Connect 4 Dataset
 [Source](https://archive.ics.uci.edu/ml/datasets/Connect-4)
 
