@@ -6,3 +6,6 @@ Stochastic Steepest Descent and Backpropagation Lab
 - [Report PDF](report/report.pdf)
 - [Report Assets](report/assets/README.md)
 - [Datasets](dataset/README.md)
+
+## Resoruces
+- [Delta Rule](https://blog.yani.ai/deltarule/)
