@@ -1,8 +1,6 @@
 import numpy as np
 
-tile_dictionary = {
-    "b": 0, "x": 1, "o": -1, "draw": 0, "win": 1, "loss": -1
-}
+# TODO: proper comments
 
 def read_file(fileName):
     '''
@@ -15,6 +13,11 @@ def generate_converters(columnCount):
     Creates a generator that assigns each column number to use a lambda function that searches the string up on tile_dictionary
     '''
     converters = {}
+
+    tile_dictionary = {
+    "b": 0, "x": 1, "o": -1, "draw": 0, "win": 1, "loss": -1
+    }
+
     for i in range(columnCount):
         converters[i] = lambda s: tile_dictionary[s.decode("utf-8")]
     return converters
