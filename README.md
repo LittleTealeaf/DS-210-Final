@@ -9,3 +9,4 @@ Stochastic Steepest Descent and Backpropagation Lab
 
 ## Resoruces
 - [Delta Rule](https://blog.yani.ai/deltarule/)
+- [Delta Rule Wikipedia](https://en.wikipedia.org/wiki/Delta_rule)
