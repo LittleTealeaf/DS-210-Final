@@ -6,7 +6,7 @@ def read_file(fileName):
     '''
     Reads the raw connect-4 data and converts it into a single matrix
     '''
-    return np.loadtxt(fileName,dtype=float,delimiter=",",converters=generate_converters(43))
+    return np.loadtxt(fileName,dtype=float,delimiter=",",converters=generate_converters(43),skiprows=1)
 
 def generate_converters(columnCount):
     '''
