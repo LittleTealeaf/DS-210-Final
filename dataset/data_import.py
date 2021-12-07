@@ -15,7 +15,7 @@ def generate_converters(columnCount):
     converters = {}
 
     tile_dictionary = {
-    "b": 0, "x": 1, "o": -1, "draw": 0, "win": 1, "loss": -1
+        "b": 0, "x": 1, "o": -1, "draw": 0, "win": 1, "loss": 0
     }
 
     for i in range(columnCount):
@@ -25,16 +25,14 @@ def generate_converters(columnCount):
 def get_data(fileName):
     '''
     Returns two matricies, the first being the data, and the second being the expected outputs
+
+    TODO change so its one output node that indicates whether player 1 wins
     '''
     data_full = read_file(fileName)
 
     data_inputs = data_full[:,:-1]
+    data_outputs = data_full[:,-1:]
 
-    data_outputs_partial = data_full[:,-1:]
-    data_outputs = np.zeros((len(data_outputs_partial),3))
-    for i in range(len(data_outputs)):
-        data_outputs[i][int(data_outputs_partial[i][0])] = 1
-    
     return data_inputs, data_outputs
 
 
