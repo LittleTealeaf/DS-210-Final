@@ -35,5 +35,4 @@ def get_data(fileName):
 
     return data_inputs, data_outputs
 
-
 print(get_data("connect-4-data.csv"))
