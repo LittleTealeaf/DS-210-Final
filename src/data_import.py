@@ -26,7 +26,6 @@ def get_data(fileName):
     '''
     Returns two matricies, the first being the data, and the second being the expected outputs
 
-    TODO change so its one output node that indicates whether player 1 wins
     '''
     data_full = read_file(fileName)
 
@@ -34,5 +33,3 @@ def get_data(fileName):
     data_outputs = data_full[:,-1:]
 
     return data_inputs, data_outputs
-
-print(get_data("connect-4-data.csv"))
