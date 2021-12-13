@@ -6,9 +6,11 @@
 \usepackage{amsmath}
 \usepackage{soul}
 \usepackage{algorithm2e}
+\usepackage[citestyle=alphabetic,bibstyle=authortitle]{biblatex}
 \usepackage{listings}
 \usepackage[margin=1in]{geometry}
 
+\addbibresource{assets/bibliography.bib}
 
 \begin{document}
 \maketitle
@@ -43,5 +45,6 @@ $$S(W_0 * f(W_i * \vec{\text{In}})) = \text{Out}$$
 
 \section{Equations}
 $$s(x) = \frac{1}{1 + e^{-x}}$$
-
+\section{Citations}
+\printbibliography
 \end{document}

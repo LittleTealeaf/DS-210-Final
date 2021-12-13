@@ -135,3 +135,15 @@ dmypy.json
 .fdb_latexmk
 .fls
 .synctex.gz
+.blg
+.bcf
+.bbl
+.run.xml
+report/report.aux
+report/report.bbl
+report/report.bcf
+report/report.blg
+report/report.fdb_latexmk
+report/report.fls
+report/report.run.xml
+report/report.synctex.gz
