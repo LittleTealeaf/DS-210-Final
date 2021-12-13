@@ -33,3 +33,9 @@ def get_data(fileName):
     data_outputs = data_full[:,-1:]
 
     return data_inputs, data_outputs
+
+def get_data_full():
+    return get_data("resoruces/connect-4-data.csv")
+
+def get_data_short():
+    return get_data("resources/connect-4-data-short.csv")
