@@ -4,13 +4,20 @@ import numpy as np
 
 def read_file(fileName):
     '''
-    Reads the raw connect-4 data and converts it into a single matrix
+    Reads the raw connect-4 data and returns it as a single matrix (excluding the first row)
+    
+    Inputs:
+     - fileName: file name (path) of .csv data
+    Output: 2-dimensional matrix of data extracted from the CSV file, using generate_converters to convert letters into numbers
     '''
     return np.loadtxt(fileName,dtype=float,delimiter=",",converters=generate_converters(43),skiprows=1)
 
 def generate_converters(columnCount):
     '''
     Creates a generator that assigns each column number to use a lambda function that searches the string up on tile_dictionary
+    
+    Input: number of columns to use the converter on
+    Output: map from all specified columns to the respective dictionary to convert from raw data to numerical data
     '''
     converters = {}
 
