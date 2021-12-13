@@ -8,8 +8,8 @@ Stochastic Steepest Descent and Backpropagation Lab
 - [Datasets](dataset/README.md)
 
 # TODO
-[] Finalize organizing of README files in repository
-[] Work on Report, make sure that link to github is in report
-[] Do hand calculations
-[] Upload hand calculations, etc, etc, etc.
-[] STUFFZ
+- [ ] Finalize organizing of README files in repository
+- [ ] Work on Report, make sure that link to github is in report
+- [ ] Do hand calculations
+- [ ] Upload hand calculations, etc, etc, etc.
+- [ ] STUFFZ
