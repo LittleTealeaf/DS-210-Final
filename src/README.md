@@ -4,3 +4,7 @@
 [Source](https://archive.ics.uci.edu/ml/datasets/Connect-4)
 
 [Dataset](connect-4-data.csv)
+
+
+# Soruce Code
+This folder contains all of the source code, including data files used in calculations
