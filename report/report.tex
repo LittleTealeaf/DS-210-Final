@@ -6,7 +6,6 @@
 \usepackage{amsmath}
 \usepackage{soul}
 \usepackage{algorithm2e}
-% \usepackage[citestyle=alphabetic,bibstyle=authortitle]{biblatex}
 \usepackage{listings}
 \usepackage{enumitem}
 \usepackage[margin=1in]{geometry}
@@ -35,14 +34,15 @@ During this section, a variety of variables and variable syntax will be used. Th
     \item[$W^n$] The weight matrix for a given layer $n$, as it applies to the values $\vec{y}^{n+1}$ (the outputs of the previous layer) 
     \item[$w^n_{i,j}$] The weight value for the value passed from node $j$ of layer $n+1$ as it is passed to node $i$ of layer $n$
 \end{description}
+% I think the way to do this is to instead have a section for each function/algorithm, which includes the derivation and then the algorithm and briefly explain it.
 \subsection{Derivations and Equations}
 The first part of designing the algorithms needed is to derive the math that will be needed in order to do every necessary function. Each of the following sub-sections describe how a given equation is derived.
 
-\subsubsection{The $\sigma$ function}
-The sigmoid activation function that will be used for all nodes (apart from the input layer, which uses a linear activation function) can be explained as follows:
+\subsubsection{Sigmoid Activation Function ($\sigma$)}
+In our neural network, we will use an activation function to condense the output of a node down to a [0-1] scale. In this lab, we will use a sigmoid function. Below is the sigmoid function and it's derivative.
 $$\sigma(n) = \frac{1}{1 + e^{-n}}$$
 $$\sigma'(n) = \sigma(n) * (1 - \sigma(n))$$
-When using this function on a matrix or vector, we simply just apply the sigma function for all individual values in the matrix/vector. 
+When using this function on a matrix or vector, we simply just apply the sigma function for all individual values in the matrix/vector.
 
 \subsubsection{Forward Feeding Equation}
 This equation represents what the output will be for a given input $\vec{y^2}$. The basic principal is derived from the following relationship for the ouputs of layer $n$:
@@ -53,24 +53,29 @@ $$y = \vec{y^0} = \sigma(W_0 * \sigma(W_1 * \vec{y^2}))$$
 % We can then simplify the first layer by writing the manual multiplication:
 % $$y = \sigma(\sum_i{(w^0_{0,i} * \sigma(W^1 * \vec{y^2})_{i,0})})$$
 \subsubsection{The Loss Function}
-The loss function is the overall function we wish to minimize, and is as follows:
+In order to measure the effectiveness of the function, we need to use a loss function that relates the output of the neural network to the expected result (from the data). We will use a simple loss function that takes the difference of these values, and then squares it to remove any negatives. We can use backwards propagation in order to change values to minimize this error, training the network to get our desired result.
 $$L = (y^0_0 - \hat{y})^2 = (y - \hat{y})^2$$
 
 \subsubsection{Derivative of Layer-0 Weights}
 In back propagation, we need to find the derivative of each of the weights in terms of the loss function. First, we need to find the derivative of the loss function with respect to the weights that connect the hidden layer with the output layer. The derivative can be simplified using the chain rule as follows:
 $$\frac{\delta L}{\delta w^0_{0,i}} = \frac{\delta L}{\delta y} * \frac{\delta y}{\delta w^0_{0,i}}$$
-We can factor this out to be the following. Note that $\sigma(\ldots) = \sigma(\sum_i{(w^0_{0,i} * \sigma(W^1 * \vec{y^2})_{i,0})}) = y$.
+We can factor this out to be the following. 
+\newline
+For simplifcation, $\sigma(\ldots) = \sigma(\sum_i{(w^0_{0,i} * \sigma(W^1 * \vec{y^2})_{i,0})}) = y$.
 $$\frac{\delta L}{\delta w^0_{0,i}} = 2(y - \hat{y}) * (\sigma'(\ldots)) * (\sigma((W^1 * \vec{y^2})_{i,0}))$$
 $$\frac{\delta L}{\delta w^0_{0,i}} = 2(y - \hat{y}) * (\sigma(\ldots)(1 - \sigma(\ldots))) * (\sigma(\sum_h{(w^1_{i,h}* y^2_{h})})$$
 $$\frac{\delta L}{\delta w^0_{0,i}} = 2(y - \hat{y}) * (y * (1 - y)) * (\sigma(\sum_h{(w^1_{i,h} y^2_{h})})$$
 $$\frac{\delta L}{\delta w^0_{0,i}} = 2(y - \hat{y}) * (y - y^2) *  (\sigma(\sum_h^{}{(w^1_{i,h} *y^2_{h})})$$
-And now, the true factored algorithm is:
+And for fun, the true factored algorithm is:
 $$\frac{\delta L}{\delta w^0_{0,i}} = \frac{2(y - \hat{y})(y - y^2)}{1 + e^{-(\sum_h^{}{(w^1_{i,h} *y^2_{h})})}}$$
+And now I'm tempted to factor it out down to the derivatives, but due to time, and space, I won't do that.
 
 \subsubsection{Derivative of Layer-1 Weights}
 Next, we need to find the derivative of each of the weights that connect the input layer to the hidden layer. We can write this derivative as follows:
 $$\frac{\delta L}{\delta w^1_{i,j}} = \frac{\delta L}{\delta w^0_{0,i}} * \frac{\delta w^0_{0,i}}{\delta y^1_i} * \frac{\delta y^1_i}{\delta w^1_{i,j}}$$
-Thus, with using $\frac{\delta L}{\delta w^0_{0,i}}$, we can derive $\frac{\delta L}{\delta w^1_{i,j}}$. We will keep $\frac{\delta L}{\delta w^0_{0,i}}$ in as itself, since in our algorithms we will be able to store this value from the previous step. In this instance, $\sigma(\ldots) = \sigma(W^1 * \vec{y^2}) = y^1_i$.
+Thus, with using $\frac{\delta L}{\delta w^0_{0,i}}$, we can derive $\frac{\delta L}{\delta w^1_{i,j}}$. We will keep $\frac{\delta L}{\delta w^0_{0,i}}$ in as itself, since in our algorithms we will be able to store this value from the previous step.
+\newline
+For simplifcation, $\sigma(\ldots) = \sigma(W^1 * \vec{y^2}) = y^1_i$.
 $$\frac{\delta L}{\delta w^1_{i,j}} = \frac{\delta L}{\delta w^0_{0,i}} * (2(y-\hat{y})(y - y^2)(\sigma'(\ldots))) * (w^1_{i,j} * y^2_{j})$$
 $$\frac{\delta L}{\delta w^1_{i,j}} = \frac{\delta L}{\delta w^0_{0,i} }* (2(y - \hat{y})(y - y^2)(\sigma(\ldots)(1 - \sigma(\ldots)))) * (w^1_{i,j} * y^2_{j})$$
 $$\frac{\delta L}{\delta w^1_{i,j}} = \frac{\delta L}{\delta w^0_{0,i}} * (2(y - \hat{y})(y - y^2)(y^1_i (1 - y^1_i))) * (w^1_{i,j} * y^2_{j})$$
