@@ -83,7 +83,7 @@ $$L = (y^0_0 - \hat{y})^2 = (y - \hat{y})^2$$
 
 \subsection{Derivative of Layer-0 Weights}
 In back propagation, we need to find the derivative of each of the weights in terms of the loss function. First, we need to find the derivative of the loss function with respect to the weights that connect the hidden layer with the output layer. The derivative can be simplified using the chain rule as follows:
-$$\frac{\delta L}{\delta w^0_{0,i}} = \frac{\delta L}{\delta y} * \frac{\delta y}{\delta w^0_{0,i}}$$
+$$\frac{\delta L}{\delta w^0_{0,i}} = \frac{\delta L}{\delta y} \cdot \frac{\delta y}{\delta w^0_{0,i}}$$
 We can factor this out to be the following. 
 \newline
 For simplifcation, $\sigma(\ldots) = \sigma(\sum_i{(w^0_{0,i} \cdot \sigma(W^1 \cdot \vec{y^2})_{i,0})}) = y$.
