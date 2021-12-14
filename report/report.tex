@@ -116,8 +116,19 @@ $$\frac{\delta L}{\delta w^1_{i,j}} = \frac{\delta L}{\delta w^0_{0,i}} \cdot 2 
 % WAIT WOULD WE HAVE THE FIRST SECTION WITH THE 2 AND SUCH CAUSE ISNT' THAT IN THE FIRST PART?
 % no wait it wouldn't be because dx of (2f(x))^2 = 2(2f(x)) * (2f'(x)) * 1(x^0)
 
+\subsection{Backwards Propagation}
+This is the heart of the whole lab project, backwards propagation. The goal of backwards propagation is to modify the values of the weights used in the neural network in order to "train" the network on a given output. Since we are trying to minimize the error term, we want to nudge the inputs in such a way that the output gets closer to the value we want. The algorithm below will iterate through a given. This algorithm is specifically designed for this given context, meaning it has been hard-coded for the 3 layer network that we have.\\
+\begin{algorithm}[H]
+    \caption{Backwards Propagation on a single input}
+    \KwIn{$Y$ - The input vector of the matrix, size $h$ x $1$
+    \newline$W^1$ - The weight matrix of the hidden layer, of dimensions $m$ x $h$. These are the weights of each of the inputs as they pass from the inputs to the hidden layer.
+    \newline$W^0$ - The weight matrix of the output layer, of dimensions $1$ x $m$. These are the weights applied to the values as they pass from the hidden layer to the output layer (which is size 1)
+    \newline$S$ - The step factor. This is the multiple that the "gradient" will be multiplied by in order to improve the network
+    \newline$\hat{Y}$ - The expected output of the neural network}
+    \KwOut{$W^1$ - The updated weight matrix of the hidden layer
+    \newline$W^0$ - The updated weight matrix of the output layer}
 
-
+\end{algorithm}
 
 
 % Pseudocode, referenced previous algorithms (just include their pseudocode)

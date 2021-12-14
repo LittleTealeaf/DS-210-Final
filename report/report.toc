@@ -1,11 +1,12 @@
-\contentsline {section}{\numberline {1}Background}{2}{}%
-\contentsline {section}{\numberline {2}Design}{2}{}%
-\contentsline {subsection}{\numberline {2.1}Sigmoid Activation Function}{2}{}%
-\contentsline {subsection}{\numberline {2.2}Forward Feeding Algorithm}{3}{}%
-\contentsline {subsection}{\numberline {2.3}Loss Function}{3}{}%
-\contentsline {subsection}{\numberline {2.4}Derivative of Layer-0 Weights}{3}{}%
-\contentsline {subsection}{\numberline {2.5}Derivative of Layer-1 Weights}{4}{}%
-\contentsline {section}{\numberline {3}Implementation}{4}{}%
-\contentsline {subsection}{\numberline {3.1}Data Importing}{4}{}%
-\contentsline {section}{\numberline {4}Validation}{4}{}%
-\contentsline {section}{\numberline {5}Reflection}{4}{}%
+\contentsline {section}{\numberline {1}Background}{2}%
+\contentsline {section}{\numberline {2}Design}{2}%
+\contentsline {subsection}{\numberline {2.1}Sigmoid Activation Function}{2}%
+\contentsline {subsection}{\numberline {2.2}Forward Feeding Algorithm}{3}%
+\contentsline {subsection}{\numberline {2.3}Loss Function}{3}%
+\contentsline {subsection}{\numberline {2.4}Derivative of Layer-0 Weights}{3}%
+\contentsline {subsection}{\numberline {2.5}Derivative of Layer-1 Weights}{4}%
+\contentsline {subsection}{\numberline {2.6}Backwards Propagation}{4}%
+\contentsline {section}{\numberline {3}Implementation}{5}%
+\contentsline {subsection}{\numberline {3.1}Data Importing}{5}%
+\contentsline {section}{\numberline {4}Validation}{5}%
+\contentsline {section}{\numberline {5}Reflection}{5}%
