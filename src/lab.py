@@ -3,18 +3,6 @@ import data_import
 import math
 from functools import lru_cache
 
-def forward_feeding(In,W0,W1):
-    '''
-    Inputs:
-    In - Input Matrix (42 x 1)
-    W0 - 0th layer weights (closest to output) (1 x b)
-    W1 - 1st layer weights (b x 42)
-
-    Outputs:
-     - The resulting chance that player 1 is winning
-    '''
-    return sigmoid(W0 @ sigmoid(W1 @ In))
-    
 
 def sigmoid(n):
     '''
@@ -41,3 +29,16 @@ def sigmoidDerivative(n):
     return sigmoid(n) * (1 - sigmoid(n))
 
 
+def forward_feeding(yIn, W):
+    '''
+    Feeds forwards a the input vector to the output
+
+    Input: yIn - A h-length vector of the initial input values
+    Input: W - An array or list of N Weight-Matrices of varying sizes. The index of the matrix should relate to the order at which they are closest to the output layer. The size of Wa should be i x j, where i is the number of nodes in that layer, and j is the number of nodes for the layer Wa+1. The last Weight-Matrix should be of size i x h
+
+    Output: Y - The resulting vector of values outputted by the neural network
+    '''
+    Y = np.copy(yIn,copy=True)
+    for i in range(len(W) - 1, -1, -1):
+        Y = sigmoid(W[i] @ Y)
+    return Y
