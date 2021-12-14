@@ -91,6 +91,9 @@ $$\frac{\delta L}{\delta w^0_{0,i}} = 2(y - \hat{y}) \cdot (\sigma'(\ldots)) \cd
 $$\frac{\delta L}{\delta w^0_{0,i}} = 2(y - \hat{y}) \cdot (\sigma(\ldots)(1 - \sigma(\ldots))) \cdot (\sigma(\sum_h{(w^1_{i,h} \cdot y^2_{h})})$$
 $$\frac{\delta L}{\delta w^0_{0,i}} = 2(y - \hat{y}) \cdot (y \cdot (1 - y)) \cdot (\sigma(\sum_h{(w^1_{i,h} y^2_{h})})$$
 $$\frac{\delta L}{\delta w^0_{0,i}} = 2(y - \hat{y}) \cdot (y - y^2) \cdot  (\sigma(\sum_h^{}{(w^1_{i,h} \cdot y^2_{h})})$$
+And because I'm crazy and it just looks aesthetic:
+$$\frac{\delta L}{\delta w^0_{0,i}} = \frac{2(y - \hat{y})(y - y^2)}{1 + e^{-(\sum_h^{}{(w^1_{i,h} *y^2_{h})})}}$$
+
 
 \subsubsection{Derivative of Layer-1 Weights}
 Next, we need to find the derivative of each of the weights that connect the input layer to the hidden layer. We can write this derivative as follows:
