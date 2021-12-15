@@ -28,30 +28,69 @@ def sigmoid_derivative(n):
     """
     return sigmoid(n) * (1 - sigmoid(n))
 
-def backwards_propagation(Y2,W1_in,W0_in,S,y_actual):
-    """Calculates and returns updated weights after updating to minimize the loss function from a given input.
-    Inputs:
-        Y2 - The input vector, dimensions m x 1
-        W1_in - The weight matrix, dimensions h x m, that represent the weights applied from the input layer to the 1st layer
-        W0_in - The weight matrix, dimensions 1 x h, that represent the weights applied from the 1st layer to the 0st layer (output)
-        S - The step coefficient, as a scalar, to modify how much change is made to the weights
-        y_actual - The expected value of the neural network, as a scalar value between [0,1]
-    Outputs:
-        W^1 - The updated weights, dimensions h x m, that represent the weights applied from the input layer to the 1st layer
-        W^0 - The updated weights, dimensions h x m, that represent the weights applied from the 1st layer to the 0st layer (output)
-        Err - The absolute error, as a scalar value, of the predicted output and the actual output for the given input
-    """
-    W1 = np.copy(W1_in)
-    W0 = np.copy(W0_in)
+# def backwards_propagation(Y2,W1_in,W0_in,S,y_actual):
+#     """Calculates and returns updated weights after updating to minimize the loss function from a given input.
+#     Inputs:
+#         Y2 - The input vector, dimensions m x 1
+#         W1_in - The weight matrix, dimensions h x m, that represent the weights applied from the input layer to the 1st layer
+#         W0_in - The weight matrix, dimensions 1 x h, that represent the weights applied from the 1st layer to the 0st layer (output)
+#         S - The step coefficient, as a scalar, to modify how much change is made to the weights
+#         y_actual - The expected value of the neural network, as a scalar value between [0,1]
+#     Outputs:
+#         W^1 - The updated weights, dimensions h x m, that represent the weights applied from the input layer to the 1st layer
+#         W^0 - The updated weights, dimensions h x m, that represent the weights applied from the 1st layer to the 0st layer (output)
+#         Err - The absolute error, as a scalar value, of the predicted output and the actual output for the given input
+#     """
+#     W1 = np.copy(W1_in)
+#     W0 = np.copy(W0_in)
+#     Y1 = sigmoid(W1 @ Y2)
+#     Y0 = sigmoid(W0 @ Y1)
+#     Err = abs(Y0[0,0] - y_actual)
+#     for i in range(len(W1)):
+#         deltaW = -1 * S * 2 * (Y0[0,0] - y_actual) * Y0[0,0] * (1 - Y0[0,0]) * Y1[i,0]
+#         W0[0,i] = W0[0,i] + deltaW
+#         for j in range(len(Y2)):
+#             W1[i,j] = W1[i,j] + deltaW * W0[0,i] * (1 - Y1[i,0]) * Y2[j,0]
+#     return (W1,W0,Err)
+
+def back_propagation(Y2, W1, W0, y_expected):
+    dW1 = np.zeros(W1.shape)
+    dW0 = np.zeros(W0.shape)
     Y1 = sigmoid(W1 @ Y2)
     Y0 = sigmoid(W0 @ Y1)
-    Err = abs(Y0[0,0] - y_actual)
+    Err = abs(Y0[0,0] - y_expected)
     for i in range(len(W1)):
-        deltaW = -1 * S * 2 * (Y0[0,0] - y_actual) * Y0[0,0] * (1 - Y0[0,0]) * Y1[i,0]
-        W0[0,i] = W0[0,i] + deltaW
+        dW0[0,i] = 2 * (y_expected - Y0[0,0]) * Y0[0,0] * (1 - Y0[0,0]) * Y1[i,0]
         for j in range(len(Y2)):
-            W1[i,j] = W1[i,j] + deltaW * W0[0,i] * (1 - Y1[i,0]) * Y2[j,0]
-    return (W1,W0,Err)
+            dW1[i,j] = dW0[0,i] * W0[0,i] * (1 - Y1[i,0]) * Y2[j,0]
+    return dW1,dW0,Err
+
+def stochastic_descent(inputs,outputs,W1,W0,step):
+    Err_total = 0
+    DW1 = np.zeros(W1.shape)
+    DW0 = np.zeros(W0.shape)
+    for i in range(len(inputs)):
+        dW1,dW0,dErr = back_propagation(inputs[i],W1,W0,outputs[i])
+        DW1 = DW1 + dW1
+        DW0 = DW0 + dW0
+        Err_total = Err_total + dErr
+    DW1 = DW1 
+    DW0 = DW0
+    Err_total = Err_total / len(inputs)
+    W1 = W1 - DW1 * step / len(inputs)
+    W0 = W0 - DW0 * step / len(inputs)
+    return W1, W0, Err_total
+
+def train_network(inputs,outputs,W1,W0,f_step,n,c,seed):
+    random.seed(seed)
+    for i in range(n):
+        step = f_step(i,n)
+        indexes = [random.randint(0,len(inputs)-1) for j in range(c)]
+        input_iteration = [inputs[j] for j in indexes]
+        output_iteration = [outputs[j] for j in indexes]
+        W1,W0,Err = stochastic_descent(input_iteration,output_iteration,W1,W0,step)
+        print("Error:",Err)
+    return W1,W0
 
 def random_matrix(size):
     m = np.zeros(size)
@@ -63,22 +102,8 @@ def random_matrix(size):
 
 if __name__ == "__main__":
     in_data, out_data = get_data_full()
-    # W1 = np.zeros((10,42))
-    hidden_count = 10
+    in_data = [np.array([[j] for j in i]) for i in in_data]
+    hidden_count = 5
     W1 = random_matrix((hidden_count,42))
     W0 = random_matrix((1,hidden_count))
-    # W0 = np.zeros((1,10))
-    total_error = 0
-    iterations = 1000000
-    for i in range(iterations):
-        index = random.randrange(0,len(in_data))
-        input = np.array([[j] for j in in_data[index]])
-        output = out_data[index,0]
-        W1,W0,error = backwards_propagation(input,W1,W0,1 + i * -(1.0 / iterations),output)
-        total_error += error
-        if(i%10000 == 0):
-            print(total_error / len(in_data))
-            total_error = 0
-        if i%10000 == 0:
-            print("actual:",output,"calculated:",sigmoid(W0 @ sigmoid(W1 @ input))[0,0])
-    
+    train_network(in_data,out_data,W1,W0,lambda n,i: 1.0 - n / i, 100,100000,1111)

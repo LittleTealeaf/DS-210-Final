@@ -39,7 +39,7 @@ def get_data(fileName):
     data_inputs = data_full[:,:-1]
     data_outputs = data_full[:,-1:]
 
-    return data_inputs, data_outputs
+    return data_inputs, np.transpose(data_outputs)[0]
 
 def get_data_full():
     return get_data("resources/connect-4-data.csv")
