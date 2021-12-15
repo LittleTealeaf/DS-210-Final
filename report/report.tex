@@ -26,13 +26,15 @@
 % These sections are good for a start, however change them up as needed
 \section{Background}
 \subsection{Goals}
-The main goal of this project is to create an algorithm that will be able to predict whether or not a player will win, from a given position on a Connect-4 board. To create an algorithm that does this, I used a neural network structure, which I trained specifically to do this calculation. To train the neural network, I used Stochastic Steepest Descent, and Back-Propagation as algorithms in order to "train" the network into accurately predicting if player 1 will win.
+The main goal of this project is to create an algorithm that will predict whether or not a given player is considered winning in any given state of connect-4. To do this, I created a neural network that takes in a connect-4 board state (6 wide x 7 high), and outputs a single number between $[0,1]$ that represents the predicted confidence that player 1 is winning. To train the network, I will use a stochastic gradient descent algorithm, as well as a back propagation algorithm, in order to update the weights.
 \subsection{Mathematics Overview}
-The process for modifying the weights goes as follows. First, we use the neural network to take a set of inputs and get the output. We then compare that to the expected value using a loss function. Using that loss function, we find the derivative of the loss function in relation to each individual weight. Since we want to minimize the loss function, we take the derivative of each weight, which points towards the direction of greatest ascent, and go in the opposite direction by some step size. We repeat this whole process with different data entries, gradually reducing the step size, approaching a point where the network can generally predict the correct value.\newline
-In order to make the forward propagation, or calculating the output of a neural network from a given input, we placed the weights in matricies. The inputs are put in a vector, and the weights in a matrix. Each row of the weight matrix represents a node in that network layer, and each column represent the weight associated with one of the input variables.
-For example, an example of a 2-layer network, that only contains an input and an output layer, is represented as follows:
-$$\begin{bmatrix} 1 & 2 \\ 2 & 1\end{bmatrix}\begin{pmatrix}1\\4\end{pmatrix} = \begin{pmatrix}9 \\ 6\end{pmatrix}$$
-Where the first value is the weights, the second value is the input vector, and the last value is the output vector. When there are multiple layers, these are just recursively chained onto eachother. Each step of the way they are also normalized using a sigma function, which is described later in the design process.
+% The process for modifying the weights goes as follows. First, we use the neural network to take a set of inputs and get the output. We then compare that to the expected value using a loss function. Using that loss function, we find the derivative of the loss function in relation to each individual weight. Since we want to minimize the loss function, we take the derivative of each weight, which points towards the direction of greatest ascent, and go in the opposite direction by some step size. We repeat this whole process with different data entries, gradually reducing the step size, approaching a point where the network can generally predict the correct value.\newline
+% In order to make the forward propagation, or calculating the output of a neural network from a given input, we placed the weights in matricies. The inputs are put in a vector, and the weights in a matrix. Each row of the weight matrix represents a node in that network layer, and each column represent the weight associated with one of the input variables.
+% For example, an example of a 2-layer network, that only contains an input and an output layer, is represented as follows:
+% $$\begin{bmatrix} 1 & 2 \\ 2 & 1\end{bmatrix}\begin{pmatrix}1\\4\end{pmatrix} = \begin{pmatrix}9 \\ 6\end{pmatrix}$$
+% Where the first value is the weights, the second value is the input vector, and the last value is the output vector. When there are multiple layers, these are just recursively chained onto eachother. Each step of the way they are also normalized using a sigma function, which is described later in the design process.
+
+
 
 \subsection{Dataset}
 
@@ -46,9 +48,10 @@ The dataset contains 67,557 entries, each one representing a state in a game of 
 x is the first player; o the second.\\
 The outcome class is the game theoretical value for the first player.
 \end{quote}
-The data is stored in a .csv file. Each row of the dataset represents a legal position. Each row is composed of 43 comma separated variables. The first 42 variables represent the board state, and teh last one represents the expected value of whether player 1 wins, loses or draws.\newline
+The data is stored in a .csv file. Each row of the dataset represents a legal position. Each row is composed of 43 comma separated variables. The first 42 variables represent the board state, and the last one represents the expected value of whether player 1 wins, loses or draws.\newline
 For the board position, there are three possible states. 'x' means that the first player has placed a piece in that square. 'o' indicates that the second player has placed their piece in that square. 'b' indicates that the square is vacant.\newline
 There are three possible "results" of the board state. "win" means that player 1 is expected to win from this game state. "lose" means that player 2 is expected to win from this game state. "draw" means that neither player is expected to win, or that the board will be completely filled before any player can get 4 in a row.
+
 
 
 
@@ -61,6 +64,7 @@ During this section, a variety of variables and variable syntax will be used. Th
     \item[$\hat{y}$] The expected final output as a scalar value
     \item[$W^n$] The weight matrix for a given layer $n$, as it applies to the values $Y^{n+1}$ (the outputs of the previous layer) 
     \item[$w^n_{i,j}$] The weight value for the value passed from node $j$ of layer $n+1$ as it is passed to node $i$ of layer $n$
+    \item[$\eta$] The step size of the gradient descent as it nudges the weights. 
 \end{description}
 
 I've sectioned off the design of the algorithms into the independant algorithms, ordering them to try and explain the progression of deriving the algorithms. 
@@ -126,41 +130,98 @@ $$\frac{\delta L}{\delta w^1_{i,j}} = 2 \cdot (y^0_{0,0} - \hat{y}) \cdot y^0_{0
 And substitute in the $0^{\text{th}}$ layer derivative!
 $$\frac{\delta L}{\delta w^1_{i,j}} = \frac{\delta L}{\delta w^0_{0,i}} \cdot w^0_{0,i}  \cdot (1 - y^1_{i,0}) \cdot y^2_{j,0} $$
 
-\subsection{Backward Propagation}
-Backward Propagation is the whole accumilation of the previous algorithms to train a neural network. First, the Backward Propagation algorithm calculates the results of the network. After doing so, it calculates the partial derivatives of the loss function in relation to each of the weights (using the Layer Weight Derivatives above). Using these derivatives, it nudges the weights according to the Step coefficient to bring the network closer to the proper variable.\newline
-Additionally, we will also calculate the absolute error of the propagation, which will make more sense in training the network\newline
+\subsection{Backwards Propagation}
+Backwards propagation is calculating the "gradient" of weights for a given input. I say "gradient" because in reality, the outputs of this algorithm will be two matricies, which each contain the derivative for each variable. We will be able to use these nudges in order to reduce the overall loss function. I also included an error calculations, such that we can also keep track of how accurate the network is at each batch of inputs.\newline
 \begin{algorithm}[H]
-    \caption{Backward Propagation for a 2-layer neural network}
+    \caption{Back Propagation for a 2-layer neural network}
     \KwIn{
         $Y^2$ - The input vector (matrix), dimensions $m$ x $1$.\newline
-        $W^1_\text{in}$ - The weight matrix, dimensions $h$ x $m$, that represents the weights used as variables go from $Y^2 \rightarrow Y^0$\newline
-        $W^0_\text{in}$ - The weight matrix, dimensions $1$ x $h$, that represents the weights used as variables go from $Y^1 \rightarrow Y^0$\newline
-        $S$ - The step coefficient to modify weights by, as a scalar value.\newline
+        $W^1$ - The weight matrix, dimensions $h$ x $m$, that represents the weights used as variables go from $Y^2 \rightarrow Y^0$\newline
+        $W^0$ - The weight matrix, dimensions $1$ x $h$, that represents the weights used as variables go from $Y^1 \rightarrow Y^0$\newline
         $\hat{y}$ - The expected result from Forward-Feeding
     }
     \KwOut{
-        $W^1$ - The modified weight matrix, describing the same thing as $W^1_\text{in}$\newline
-        $W^0$ - The modified weight matrix, describing the same thing as $W^0_\text{in}$\newline
-        Err - The absolute error of the network
+        $\delta W^1$ - A matrix of the derivatives of the weights in $W^1$, as a $n$ x $m$ matrix.\newline
+        $\delta W^0$ - A matrix of the derivatives of the weights in $W^0$, as a $1$ x $h$ matrix.\newline
+        Err - The absolute error of the network for this given input
     }
-    $W^1 \gets \text{copy of } W^1_\text{in}$\\
-    $W^0 \gets \text{copy of } W^0_\text{in}$\\
+    $\delta W^1 \gets$ new matrix of dimensions $n$ x $m$\\
+    $\delta W^0 \gets$ new matrix of dimensions $1$ x $h$\\
     $Y^1 \gets \sigma(W^1 \cdot Y^2)$\\
     $Y^0 \gets \sigma(W^0 \cdot Y^1)$\\
-    $\text{Err} \gets | (Y^0_{0,0} - \hat{y}) |$\\
+    $\text{Err} \gets | Y^0_{0,0} - \hat{y} |$\\
     \For{$i \gets (0, 1, \ldots, h-1)$}{
-        $\Delta W^0 \gets -S \cdot 2 \cdot (Y^0_{0,0} - \hat{y}) \cdot Y^0_{0,0} \cdot (1 - Y^0_{0,0}) \cdot Y^1_{i,0}$\\
-        $W^0_{0,i} \gets W^0_{0,i} + \Delta W^0$\\
+        $\delta W^0_{0,i} \gets 2 \cdot (Y^0_{0,0} - \hat{y}) \cdot Y^0_{0,0} \cdot (1 - Y^0_{0,0}) \cdot Y^1_{i,0}$\\
+
         \For{$j \gets (0, 1, \ldots, m-1)$}{
-            $W^1_{i,j} \gets W^1_{i,j} + \Delta W^0 \cdot W^0_{0,i}  \cdot (1 - y^1_{i,0}) \cdot y^2_{j,0}$
+            $\delta W^1_{i,j} \cdot W^0_{0,i}  \cdot (1 - y^1_{i,0}) \cdot y^2_{j,0}$
         }
     }
-    \Return{$W^1, W^0$, Err}
+    \Return{$\delta W^1, \delta W^0,$ Err}
+\end{algorithm}
+
+\subsection{Stochastic Gradient Descent}
+For a good portion while working on this project, this was the part I was the most confused on. Stochastic steepest descent, at least my interpretation of it, is taking the accumulation of all of the weight changes taken from the back propagation algorithm, and averaging them before applying them to the network. The general formula is described as follows:
+$$W^i = W^i  - \frac{\eta}{n} \cdot \sum_i^n{\text{Back-Propagation}(\ldots)_{W^i}} $$
+To update each of the weights, we take the average changes in the back propagation, and multiply it by a scalar coefficient $\eta$, which represents the step size of the learning. The smaller $\eta$ is, the less the network will learn. For a single cycle in gradient descent, we will use the following algorithm to update the weights accordingly:\newline
+\begin{algorithm}[H]
+    \caption{Stochastic Gradient Descent Iteration}
+    \KwIn{
+        input - Length-$n$ list of input vectors, as matrices. Each input vector is of size $m$ x $1$\newline
+        output - Length-$n$ list of all expected values, as scalars. Each output corresponds to the input at that same index\newline
+        $W^1$ - The weight matrix, dimensions $h$ x $m$, that represents the weights used as variables go from $Y^2 \rightarrow Y^0$\newline
+        $W^0$ - The weight matrix, dimensions $1$ x $h$, that represents the weights used as variables go from $Y^1 \rightarrow Y^0$\newline
+        $\eta$ - The step coefficient to nudge the weights by.
+    }
+    \KwOut{
+        $W^1$ - The updated weight matrix, dimensions $h$ x $m$, where values have been modified by their average derivative across all inputs/outputs, scaled by $\eta$\newline
+        $W^0$ - The updated weight matrix, dimensions $1$ x $h$, where values have been modified by their average derivative across all inputs/outputs, scaled by $\eta$\newline
+        Err - The average absolute error of the network on each input.
+    }
+    Err Total $\gets 0$\\
+    $\Delta W^1 \gets$ matrix of zeros with dimensions $h$ x $m$\\
+    $\Delta W^0 \gets$ matrix of zeros with dimensions $1$ x $h$\\
+    \For{$i \gets 0, 1, \ldots, n-1$}{
+        $\delta W^1, \delta W^0, \delta \text{Err} \gets $ Back Propagation on input$[i]$ and output$[i]$\\
+        $\Delta W^1 \gets \Delta W^1 + \delta W^1$\\
+        $\Delta W^0 \gets \Delta W^0 + \delta W^0$\\
+        Err Total $\gets \text{Err Total} + \text{Err}$
+    }
+    $\Delta W^1 \gets \eta / n \cdot \Delta W^1$\\
+    $\Delta W^0 \gets \eta / n \cdot \Delta W^0$\\
+    Err Total $\gets \text{Err Total} / n$\\
+    \Return{$\Delta W^1, \Delta W^0, \text{Err Total}$}
 \end{algorithm}
 
 \subsection{Training the Network}
-Now, if you give the same input and expected output into the Backwards Propagation enough times, it's going to give you a network wtih 0\% error for that input. However, it will perform very poorly when tested against a different set of inputs.\newline
-While we do have an abundance of trials that we are able to draw from (67,557 entries to be exact), we could simply run through each and every entry multiple times to get enough data. The question relies in how we manage our Step value, which should be large at first, and as it progresses, gets smaller and smaller. The way that the network is trained will be up to a bit of experimentation, which I will be experimenting with.
+Now, in order to train the network, I need to send in batches of data for it to train on, and each batch of data I need to reduce the step function so the network can fine-tune its training. I plan to do this by using a random sample approach. I'll have a set of modifyable parameters, namely the batch size and the iteration count. These will allow me to change how many data points are put in to the network for each iteration, and how many iterations I will have. For step size, I will pass in a function, such that I can experiment with different step size functions. During implementation, I may also allow the ability to allow for keyboard interruption instead, so I can leave it running for however long I want, and come back to a trained network. The algorithm to perform this training is described as follows:\newline
+\begin{algorithm}[H]
+    \caption{Neural Network Training Algorithm}
+    \KwIn{
+        input - Length-$n$ list of input vectors, as matrices. Each input vector is of size $m$ x $1$\newline
+        output - Length-$n$ list of all expected values, as scalars. Each output corresponds to the input at that same index\newline
+        $W^1$ - The weight matrix, dimensions $h$ x $m$, that represents the weights used as variables go from $Y^2 \rightarrow Y^0$\newline
+        $W^0$ - The weight matrix, dimensions $h$ x $m$, that represents the weights used as variables go from $Y^2 \rightarrow Y^0$\newline
+        $f(i, I)$ - Step size function, which when passed in a current iteration $i$, and total iteration count $I$, returns the step size for that iteration\newline
+        $I$ - The total number of iterations to run\newline
+        $c$ - The total number of inputs to feed into each iteration
+    }
+    \KwOut{
+        $W^1$ - The updated weight matrix, dimensions $h$ x $m$, trained on the given inputs and outputs
+        $W^0$ - The updated weight matrix, dimensions $1$ x $h$, trained on the given inputs and outputs
+    }
+    \For{$i \gets 0, 1, \ldots, n-1$}{
+        $\eta \gets f(i,I)$\\
+        indexes $\gets$ list of uniform-random indexes within the range $[0,n-1]$\\
+        input-iteration $\gets$ list of inputs at each corresponding index from indexes\\
+        output-iteration $\gets$ list of outputs at each corresponding index from indexes\\
+        $W^1, W^0, Err \gets$ Stochastic Gradient Descent of weights and step size for input-iteration and output-iteration\\
+        Log the $Err$ of the training
+    }
+    \Return{$W^1, W^0$}
+\end{algorithm}
+% Now, if you give the same input and expected output into the Backwards Propagation enough times, it's going to give you a network wtih 0\% error for that input. However, it will perform very poorly when tested against a different set of inputs.\newline
+% While we do have an abundance of trials that we are able to draw from (67,557 entries to be exact), we could simply run through each and every entry multiple times to get enough data. The question relies in how we manage our Step value, which should be large at first, and as it progresses, gets smaller and smaller. The way that the network is trained will be up to a bit of experimentation, which I will be experimenting with.
 
 % Pseudocode, referenced previous algorithms (just include their pseudocode)
 \section{Implementation}
