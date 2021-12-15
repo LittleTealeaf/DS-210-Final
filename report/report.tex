@@ -11,6 +11,7 @@
 \usepackage{enumitem}
 \usepackage[margin=1in]{geometry}
 \usepackage{float}
+\usepackage{url}
 
 
 \begin{document}
@@ -28,17 +29,13 @@
 \subsection{Goals}
 The main goal of this project is to create an algorithm that will predict whether or not a given player is considered winning in any given state of connect-4. To do this, I created a neural network that takes in a connect-4 board state (6 wide x 7 high), and outputs a single number between $[0,1]$ that represents the predicted confidence that player 1 is winning. To train the network, I will use a stochastic gradient descent algorithm, as well as a back propagation algorithm, in order to update the weights.
 \subsection{Mathematic Background}
-The process of modifying the weights is what drives the neural network to learn. Training it is an iterative process; Each iteration, we give the network a random sample of data to train off of. We then take the average "gradient" and modify the weights accordingly.\newline
-To describe it best, lets start from the ground up. First, we are given a neural network. A neural network is a "network" that partially mimics a neuron map. The network is divided into layers. For this project, we will use a neural network with 1 hidden layer. If you are confused about how a neural network actually functions, I suggest watching this video (\url{https://www.youtube.com/watch?v=aircAruvnKk}) by 3blue1brown on Youtube. He does a great job with providing a clean animation to describe what is actually happening.\newline
-
-
-% The process for modifying the weights goes as follows. First, we use the neural network to take a set of inputs and get the output. We then compare that to the expected value using a loss function. Using that loss function, we find the derivative of the loss function in relation to each individual weight. Since we want to minimize the loss function, we take the derivative of each weight, which points towards the direction of greatest ascent, and go in the opposite direction by some step size. We repeat this whole process with different data entries, gradually reducing the step size, approaching a point where the network can generally predict the correct value.\newline
-% In order to make the forward propagation, or calculating the output of a neural network from a given input, we placed the weights in matricies. The inputs are put in a vector, and the weights in a matrix. Each row of the weight matrix represents a node in that network layer, and each column represent the weight associated with one of the input variables.
-% For example, an example of a 2-layer network, that only contains an input and an output layer, is represented as follows:
-% $$\begin{bmatrix} 1 & 2 \\ 2 & 1\end{bmatrix}\begin{pmatrix}1\\4\end{pmatrix} = \begin{pmatrix}9 \\ 6\end{pmatrix}$$
-% Where the first value is the weights, the second value is the input vector, and the last value is the output vector. When there are multiple layers, these are just recursively chained onto eachother. Each step of the way they are also normalized using a sigma function, which is described later in the design process.
-
-
+The process of modifying the weights is what drives the neural network to learn. Training it is an iterative process; Each iteration, we give the network a random sample of data to train off of. We then take the average "gradient" and modify the weights accordingly.\par
+To describe it best, lets start from the ground up. First, we are given a neural network. A neural network is a "network" that partially mimics a neuron map. The network is divided into layers. For this project, we will use a neural network with 1 hidden layer. If you are confused about how a neural network actually functions, I suggest watching this video (\url{https://www.youtube.com/watch?v=aircAruvnKk}) by 3blue1brown on Youtube. He does a great job with providing a clean animation to describe what is actually happening.\par
+So we have a neural network, which basically is just a great big equation with a bunch of variables. Those variables, apart from the input variables, are all of our "weights". We store these weights into matrices. Each matrix represents the flow of values from one layer to the next\par
+Now, we need to create a function we want to reduce, or a "loss" function. What this means is that the loss function should be lower if our network results in an answer closer to the expected answer for that input. In short, the higher the loss value, the worse the network. In order to improve the network, we need to modify the weights in such a way that it reduces the loss function.\par
+This is where derivatives come in. Given a partial derivative of a function with respect to a variable, that derivative indicates the direction of greatest ascent in the function. If we inverse it, however, we get the direction of greatest \textit{descent}. Using this, we can calculate the partial derivative of the loss function with respect to each weight, and use that to modify the weights in such a way that improves the accuracy of the network. Each iteration, we reduce the "scale" at which we modify these variables by. Think of this as playing golf on a huge space. You want to get "within a ballpark" on your first shot, then fine tune further shots until you make it in the hole.\par
+Now, while modifying the values each iteration from a single input/output would work, it makes the network favor earlier passes much more than later passes. To eliviate this, we keep the same network for a set of batch. We calculate the weight gradients for each input/output in the batch, and instead of applying each one to the network, we apply the average of the gradients to the network.\par
+To summarize, we first iterate a number of times. Each iteration, we create a batch of randomly selected inputs and expected outputs. We feed those in, and use the loss function to find the partial derivatives for each of the weights. Next, we average out those derivatives for each weight, multiply it by some step factor that decreases over time, and apply those changes to the network. By repeating this, we start to get a network that can potentially properly evaluate our connect-4 state.
 
 \subsection{Dataset}
 
@@ -52,10 +49,10 @@ The dataset contains 67,557 entries, each one representing a state in a game of 
 x is the first player; o the second.\\
 The outcome class is the game theoretical value for the first player.
 \end{quote}
-The data is stored in a .csv file. Each row of the dataset represents a legal position. Each row is composed of 43 comma separated variables. The first 42 variables represent the board state, and the last one represents the expected value of whether player 1 wins, loses or draws.\newline
-For the board position, there are three possible states. 'x' means that the first player has placed a piece in that square. 'o' indicates that the second player has placed their piece in that square. 'b' indicates that the square is vacant.\newline
-There are three possible "results" of the board state. "win" means that player 1 is expected to win from this game state. "lose" means that player 2 is expected to win from this game state. "draw" means that neither player is expected to win, or that the board will be completely filled before any player can get 4 in a row.
-
+The data is stored in a .csv file. Each row of the dataset represents a legal position. Each row is composed of 43 comma separated variables. The first 42 variables represent the board state, and the last one represents the expected value of whether player 1 wins, loses or draws.\par
+For the board position, there are three possible states. 'x' means that the first player has placed a piece in that square. 'o' indicates that the second player has placed their piece in that square. 'b' indicates that the square is vacant.\par
+There are three possible "results" of the board state. "win" means that player 1 is expected to win from this game state. "lose" means that player 2 is expected to win from this game state. "draw" means that neither player is expected to win, or that the board will be completely filled before any player can get 4 in a row.\par
+In using the dataset, we need to convert the letters to numbers. First, for the board position, we will make $\text{'x'} = 1$, $\text{'o'} = -1$, and $\text{'b'} = 0$. Secondly, because we want our network to predict whether or not player 1 will win, we will make $\text{'lose'} = \text{'draw'} = 0$ and $\text{'win'} = 1$
 
 
 
@@ -228,7 +225,7 @@ Now, in order to train the network, I need to send in batches of data for it to 
 \end{algorithm}
 \section{Implementation}
 \subsection{Data Importing}
-Since the data was given in a .csv file type, an additional script was given 
+Since the data was given in a .csv file type, with strings instead of numbers, another python script was created in order to convert the data into something the network could use. The file \path{data_import.py} contains the code responsbile for importing the data for the 
 % Reference methods / describe code?
 \section{Validation}
 \section{Reflection}
