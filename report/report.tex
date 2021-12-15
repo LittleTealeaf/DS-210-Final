@@ -55,7 +55,7 @@ There are three possible "results" of the board state. "win" means that player 1
 In using the dataset, we need to convert the letters to numbers. First, for the board position, we will make $\text{'x'} = 1$, $\text{'o'} = -1$, and $\text{'b'} = 0$. Secondly, because we want our network to predict whether or not player 1 will win, we will make $\text{'lose'} = \text{'draw'} = 0$ and $\text{'win'} = 1$
 
 
-
+\newpage
 \section{Design}
 During this section, a variety of variables and variable syntax will be used. The following is a list that explains each variable. Remember that for a given "layer", the output is considered the 0th layer, the hidden layer is considered the 1st layer, and the input is considered the 2nd layer.
 \begin{description}[style=nextline]
@@ -99,9 +99,21 @@ The Feed-Forward algorithm is the algorithm used to "run" a neural network. This
 $$\vec{y^n} = \sigma(W_{n} \cdot \vec{y^{n+1}})$$
 If we substitute in all of our layers, we can get the following equation as the result of the entire network.
 $$y = y^0_{0,0} = \sigma(W_0 \cdot \sigma(W_1 \cdot \vec{y^2}))_{0,0}$$
+The algorithm that performs the calculations as the input vectors move from one layer to the next is as follows:
+\begin{algorithm}[H]
+    \caption{Feed Forward one step}
+    \KwIn{
+        $Y$ - The previous layer values, as a matrix of size $h$ x $1$. This value can also be regarded as $Y^n-1$.\newline
+        $W$ - The weight matrix, as a matrix of size $k$ x $h$, where $k$ is the number of nodes in the target layer. This value could also be regarded as $W^n$
+    }
+    \KwOut{
+        $Y^n$ - The resulting values of the nodes at the target layer.
+    }
+    \Return{$\sigma(W \cdot Y)$}
+\end{algorithm}
 \subsection{Loss Function}
 In order to use gradient descent, we will need to create a function that measures the correctness of our network. This is known as the "Loss Function". The premise of the loss function is that the higher it is, the worse the network is. Therefore, in order to make our network more accurate, we need to minimize this value.
-$$L = (\hat{y} - y^0_{0,0})^2 = (]\hat{y} - y)^2$$
+$$L = (y^0_{0,0} - \hat{y} )^2 = (]\hat{y} - y)^2$$
 
 \subsection{0th Layer Weight Derivative}
 
@@ -112,9 +124,9 @@ $$y^1_{i,0} = \sigma(\sum_h{w^1_{i,h} \cdot y^2_{h,0}})$$
 $$y^0_{0,0} = \sigma(\sum_h{w^0_{0,h} \cdot y^1_{h,0}})$$
 We can calculate the derivative as follows:
 $$\frac{\delta L}{\delta w^0_{0,i}} = \frac{\delta L}{\delta y^0_{0,0}} \cdot \frac{\delta y^0_{0,0}}{\delta \sum_h{w^0_{0,h} \cdot y^1_{h,0}}} \cdot \frac{\delta \sum_h{w^0_{0,h} \cdot y^1_{h,0}}}{\delta w^0_{0,i}}$$
-$$\frac{\delta L}{\delta w^0_{0,i}} = 2 \cdot (\hat{y} - y^0_{0,0}) \cdot \sigma'(\sum_h{w^0_{0,h} \cdot y^1_{h,0}}) \cdot y^1_{i,0}$$
-$$\frac{\delta L}{\delta w^0_{0,i}} = 2 \cdot (\hat{y} - y^0_{0,0}) \cdot \sigma(\sum_h{w^0_{0,h} \cdot y^1_{h,0}}) \cdot (1 - \sigma(\sum_h{w^0_{0,h} \cdot y^1_{h,0}})) \cdot y^1_{i,0}$$
-$$\frac{\delta L}{\delta w^0_{0,i}} = 2\cdot (\hat{y} - y^0_{0,0}) \cdot y^0_{0,0} \cdot (1 - y^0_{0,0}) \cdot y^1_{i,0}$$
+$$\frac{\delta L}{\delta w^0_{0,i}} = 2 \cdot (y^0_{0,0} - \hat{y} ) \cdot \sigma'(\sum_h{w^0_{0,h} \cdot y^1_{h,0}}) \cdot y^1_{i,0}$$
+$$\frac{\delta L}{\delta w^0_{0,i}} = 2 \cdot (y^0_{0,0} - \hat{y} ) \cdot \sigma(\sum_h{w^0_{0,h} \cdot y^1_{h,0}}) \cdot (1 - \sigma(\sum_h{w^0_{0,h} \cdot y^1_{h,0}})) \cdot y^1_{i,0}$$
+$$\frac{\delta L}{\delta w^0_{0,i}} = 2\cdot (y^0_{0,0} - \hat{y} ) \cdot y^0_{0,0} \cdot (1 - y^0_{0,0}) \cdot y^1_{i,0}$$
 
 \subsection{1st Layer Weight Derivative}
 Next, we need to find the derivative of each of the weights that connect the input layer to the hidden layer.\\
@@ -123,11 +135,11 @@ $$y^1_{i,0} = \sigma(\sum_h{w^1_{i,h} \cdot y^2_{h,0}})$$
 $$y^0_{0,0} = \sigma(\sum_h{w^0_{0,h} \cdot y^1_{h,0}})$$
 We can calculate the derivative as the following:
 $$\frac{\delta L}{\delta w^1_{i,j}} = \frac{\delta L}{\delta y^0_{0,0}} \cdot \frac{\delta y^0_{0,0}}{\delta \sum_h{w^0_{0,h} \cdot y^1_{h,0}}} \cdot \frac{\delta \sum_h{w^0_{0,h} \cdot y^1_{h,0}}}{\delta y^1_{i,0}} \cdot \frac{\delta y^1_{i,0}}{\delta \sum_h{w^1_{i,h} \cdot y^2_h}} \cdot \frac{\delta \sum_h{w^1_{i,h} \cdot y^2_{h,0}}}{\delta w^1_{i,j}}$$
-$$\frac{\delta L}{\delta w^1_{i,j}} = 2\cdot (\hat{y} - y^0_{0,0}) \cdot \sigma'(\sum_h{w^0_{0,h} \cdot y^1_{h,0}}) \cdot w^0_{0,i} \cdot \sigma'(\sum_h{w^1_{i,h} \cdot y^2_{h,0}}) \cdot y^2_{j,0}$$
-$$\frac{\delta L}{\delta w^1_{i,j}} = 2 \cdot (\hat{y} - y^0_{0,0}) \cdot \sigma(\sum_h{w^0_{0,h} \cdot y^1_{h,0}}) \cdot (1 - \sigma(\sum_h{w^0_{0,h} \cdot y^1_{h,0}})) \cdot w^0_{0,i} \cdot \sigma(\sum_h{w^1_{i,h} \cdot y^2_{h,0}}) \cdot (1 - \sigma(\sum_h{w^1_{i,h} \cdot y^2_{h,0}})) \cdot  y^2_{j,0}$$
-$$\frac{\delta L}{\delta w^1_{i,j}} = 2 \cdot (\hat{y} - y^0_{0,0}) \cdot y^0_{0,0} \cdot (1 - y^0_{0,0}) \cdot w^0_{0,i} \cdot y^1_{i,0} \cdot (1 - y^1_{i,0}) \cdot y^2_{j,0}$$
+$$\frac{\delta L}{\delta w^1_{i,j}} = 2\cdot (y^0_{0,0} - \hat{y} ) \cdot \sigma'(\sum_h{w^0_{0,h} \cdot y^1_{h,0}}) \cdot w^0_{0,i} \cdot \sigma'(\sum_h{w^1_{i,h} \cdot y^2_{h,0}}) \cdot y^2_{j,0}$$
+$$\frac{\delta L}{\delta w^1_{i,j}} = 2 \cdot (y^0_{0,0} - \hat{y} ) \cdot \sigma(\sum_h{w^0_{0,h} \cdot y^1_{h,0}}) \cdot (1 - \sigma(\sum_h{w^0_{0,h} \cdot y^1_{h,0}})) \cdot w^0_{0,i} \cdot \sigma(\sum_h{w^1_{i,h} \cdot y^2_{h,0}}) \cdot (1 - \sigma(\sum_h{w^1_{i,h} \cdot y^2_{h,0}})) \cdot  y^2_{j,0}$$
+$$\frac{\delta L}{\delta w^1_{i,j}} = 2 \cdot (y^0_{0,0} - \hat{y} ) \cdot y^0_{0,0} \cdot (1 - y^0_{0,0}) \cdot w^0_{0,i} \cdot y^1_{i,0} \cdot (1 - y^1_{i,0}) \cdot y^2_{j,0}$$
 We can then reorder it as..
-$$\frac{\delta L}{\delta w^1_{i,j}} = 2 \cdot (\hat{y} - y^0_{0,0}) \cdot y^0_{0,0} \cdot (1 - y^0_{0,0})\cdot y^1_{i,0} \cdot w^0_{0,i}  \cdot (1 - y^1_{i,0}) \cdot y^2_{j,0}$$
+$$\frac{\delta L}{\delta w^1_{i,j}} = 2 \cdot (y^0_{0,0} - \hat{y} ) \cdot y^0_{0,0} \cdot (1 - y^0_{0,0})\cdot y^1_{i,0} \cdot w^0_{0,i}  \cdot (1 - y^1_{i,0}) \cdot y^2_{j,0}$$
 And substitute in the $0^{\text{th}}$ layer derivative!
 $$\frac{\delta L}{\delta w^1_{i,j}} = \frac{\delta L}{\delta w^0_{0,i}} \cdot w^0_{0,i}  \cdot (1 - y^1_{i,0}) \cdot y^2_{j,0} $$
 
@@ -148,14 +160,14 @@ Backwards propagation is calculating the "gradient" of weights for a given input
     }
     $\delta W^1 \gets$ new matrix of dimensions $n$ x $m$\\
     $\delta W^0 \gets$ new matrix of dimensions $1$ x $h$\\
-    $Y^1 \gets \sigma(W^1 \cdot Y^2)$\\
-    $Y^0 \gets \sigma(W^0 \cdot Y^1)$\\
-    $\text{Err} \gets | \hat{y} - y^0_{0,0} |$\\
+    $Y^1 \gets \text{Feed Forward}(Y^2,W^1)$\\
+    $Y^0 \gets \text{Feed Forward}(Y^1,W^0)$\\
+    $\text{Err} \gets | y^0_{0,0} - \hat{y}  |$\\
     \For{$i \gets (0, 1, \ldots, h-1)$}{
-        $\delta W^0_{0,i} \gets 2 \cdot (\hat{y} - y^0_{0,0}) \cdot Y^0_{0,0} \cdot (1 - Y^0_{0,0}) \cdot Y^1_{i,0}$\\
+        $\delta W^0_{0,i} \gets 2 \cdot (y^0_{0,0} - \hat{y} ) \cdot Y^0_{0,0} \cdot (1 - Y^0_{0,0}) \cdot Y^1_{i,0}$\\
 
         \For{$j \gets (0, 1, \ldots, m-1)$}{
-            $\delta W^1_{i,j} \gets \delta W^0_{0,i} \cdot W^0_{0,i}  \cdot (1 - y^1_{i,0}) \cdot y^2_{j,0}$
+            $\delta W^1_{i,j} \gets \delta W^0_{0,i} \cdot W^0_{0,i}  \cdot (1 - Y^1_{i,0}) \cdot Y^2_{j,0}$
         }
     }
     \Return{$\delta W^1, \delta W^0,$ Err}
@@ -223,11 +235,77 @@ Now, in order to train the network, I need to send in batches of data for it to 
     }
     \Return{$W^1, W^0$}
 \end{algorithm}
+
 \section{Implementation}
 Implementing the algorithms was mostly straight-forward. The only caveat came with data importing, which is described below.
 \subsection{Data Importing}
 Since the data was given in a .csv file type, with strings instead of numbers, another python script was created in order to convert the data into something the network could use. The file \path{data_import.py} contains the code responsbile for importing the data for the data and converting the string values into numbers for the network to perform.
 % Reference methods / describe code?
+\newpage
 \section{Validation}
+Since the algorithms were made to be dynamic, and the provided dataset is so large, I will instead be using smaller matrices in order to verify that our algorithms work. I will verify the algorithms that we implemented with drawn-out steps describing the math happening on the back end.
+\subsection{Sigmoid Activation Function}
+First, I need to make sure that my sigmoid activation function works for inputs, whether they are arrays, matrices, or just scalar values.\par
+Calculating the $\sigma(n)$ function for a scalar value, with the input $5$:
+$$\sigma(n) = \frac{1}{1 + e^-n}$$
+$$\sigma(5) = \frac{1}{1 + e^-5}$$
+$$\sigma(5) = \frac{1}{1 + 0.006737946999085467}$$
+$$\sigma(5) = \frac{1}{1.006737946999085467}$$
+$$\sigma(5) = 0.9933071490757153$$
+To check that it works for an array, I am going to use a 2-length array $[5,10]$. I found that $\sigma(10) = 0.9999546021312976$. Therefore using the same algorithm:
+$$\sigma([5,10]) = [0.9933071490757153,0.9999546021312976]$$
+The algorithms implemented in python had all of these tests correct, up to the point of precision it displayed (when doing the array, it displayed signfiicantly less digits, but they were all right). Given that the algorithm is more or less recursive, I'm not going to go through testing any dimension of matrices.
+
+\subsection{Feed-Forward Algorithm}
+To test our Feed-Forward algorithm we will use a very, very, very simple network. The network will consist of a 2-length input vector, a hidden layer of 2 nodes, and a single output node. Given this, the variables I will use are:
+$$Y^2 = \begin{bmatrix}1 \\ -1\end{bmatrix}, W^1 = \begin{bmatrix}1 & 0.5 \\ -1 & 0\end{bmatrix}$$
+To feed forward one layer, the full algorithm is as follows:
+$$\text{Feed-Forward}(Y^2,W^1) = \sigma(W^1 \cdot Y^2)$$
+$$\text{Feed-Forward}(\begin{bmatrix}1 \\ -1\end{bmatrix},\begin{bmatrix}1 & 0.5 \\ -1 & 0\end{bmatrix}) = \sigma(\begin{bmatrix}1 & 0.5 \\ -1 & 0\end{bmatrix} \cdot \begin{bmatrix}1 \\ -1\end{bmatrix})$$
+$$\text{Feed-Forward}(\begin{bmatrix}1 \\ -1\end{bmatrix},\begin{bmatrix}1 & 0.5 \\ -1 & 0\end{bmatrix}) = \sigma(\begin{bmatrix}1 \cdot 1 + 0.5 \cdot -1\\-1 \cdot 1 + 0 \cdot -1\end{bmatrix} = \begin{bmatrix}0.5\\-1\end{bmatrix}) = \begin{bmatrix}0.6224593312018546\\0.2689414213699951\end{bmatrix}$$
+The code successfully returned the correct value of the feed-forward algorithm, meaning that our algorithm has been implemented successfully.
+
+\subsection{Backwards Propagation}
+To verify that my backwards propagation algorithm was implemented correctly, I are going to expand upon the test variables that we have before.
+$$Y^2 = \begin{bmatrix}1 \\ -1\end{bmatrix}, W^1 = \begin{bmatrix}1 & 0.5 \\ -1 & 0\end{bmatrix},W^0 = \begin{bmatrix}0.5 & 2\end{bmatrix},\hat{y} = 0.5$$
+Now, I will run through the backwards propagation algorithm to verify that it works. 
+$$\delta W^1 = \begin{bmatrix}0&0\\0&0\end{bmatrix}, \delta W^0 = \begin{bmatrix}0&0\end{bmatrix}$$
+$$Y^1 = \text{Feed-Forward}(Y^2,W^1) = \begin{bmatrix}0.6224593312018546\\0.2689414213699951\end{bmatrix}$$
+$$Y^0 = \text{Feed-Forward}(Y^1,W^0) = \begin{bmatrix}0.7003809377121779\end{bmatrix}$$
+$$Error = |y^0_{0,0} - \hat{y} | = |0.7003809377121779 - 0.5| = 0.2003809377121779$$
+
+$i = 0$ of $[0,1]$:
+$$\delta W^0_{0,0} = 2 \cdot (y^0_{0,0} - \hat{y} ) \cdot Y^0_{0,0} \cdot (1 - Y^0_{0,0}) \cdot Y^1_{0,0}$$
+$$\delta W^0_{0,0} = 2 \cdot (0.7003809377121779 - 0.5) \cdot 0.7003809377121779 \cdot (1 - 0.7003809377121779) \cdot 0.6224593312018546$$
+$$\delta W^0_{0,0} = 0.05234812610012824$$
+$$\delta W^0 = \begin{bmatrix}0.05234812610012824&0\end{bmatrix}$$
+$i = 0, j = 0$ of $[0,1]$:
+$$\delta W^1_{0,0} = \delta W^0_{0,0} \cdot W^0_{0,0} \cdot (1 - Y^1_{0,0}) \cdot Y^2_{0,0}$$
+$$\delta W^1_{0,0} = 0.05234812610012824 \cdot 0.5 \cdot (1 - 0.6224593312018546) \cdot 1$$
+$$\delta W^1_{0,0} = 0.009881773269086033$$
+$$\delta W^1 = \begin{bmatrix}0.009881773269086033&0\\0&0\end{bmatrix}$$
+$i = 0, j = 1$ of $[0,1]$:
+$$\delta W^1_{0,1} = \delta W^0_{0,0} \cdot W^0_{0,0} \cdot (1 - Y^1_{0,0} \cdot Y^2_{1,0})$$
+$$\delta W^1_{0,1} = 0.05234812610012824 \cdot 0.5 \cdot (1 - 0.6224593312018546) \cdot -1$$
+$$\delta W^1_{0,1} = -0.009881773269086033$$
+$$\delta W^1 = \begin{bmatrix}0.009881773269086033&-0.009881773269086033\\0&0\end{bmatrix}$$
+$i = 1$ of $[0,1]$:
+$$\delta W^0_{0,1} = 2 \cdot (y^0_{0,0} - \hat{y} ) \cdot Y^0_{0,0} \cdot (1 - Y^0_{0,0}) \cdot Y^1_{1,0}$$
+$$\delta W^0_{0,1} = 2 \cdot (0.7003809377121779 - 0.5) \cdot 0.7003809377121779 \cdot (1 - 0.7003809377121779) \cdot 0.2689414213699951$$
+$$\delta W^0_{0,1} = 0.02261766951463492$$
+$$\delta W^0 = \begin{bmatrix}0.05234812610012824&0.02261766951463492\end{bmatrix}$$
+$i = 1, j = 0$ of $[0,1]$:
+$$\delta W^1_{1,0} = \delta W^0_{0,1} \cdot W^0_{0,1} \cdot (1 - Y^1_{1,0}) \cdot Y^2_{0,0}$$
+$$\delta W^1_{1,0} = 0.02261766951463492 \cdot 2 \cdot (1 - 0.2689414213699951) \cdot 1$$
+$$\delta W^1_{1,0} = 0.0330696826545844$$
+$$\delta W^1 = \begin{bmatrix}0.009881773269086033&-0.009881773269086033\\0.0330696826545844&0\end{bmatrix}$$
+$i = 1, j = 1$ of $[0,1]$:
+$$\delta W^1_{1,1} = \delta W^0_{0,1} \cdot W^0_{0,1} \cdot (1 - Y^1_{1,0} \cdot Y^2_{1,0})$$
+$$\delta W^1_{1,0} = 0.02261766951463492 \cdot 2 \cdot (1 - 0.2689414213699951) \cdot -1$$
+$$\delta W^1_{1,0} = -0.0330696826545844$$
+$$\delta W^1 = \begin{bmatrix}0.009881773269086033&-0.009881773269086033\\0.0330696826545844&-0.0330696826545844\end{bmatrix}$$
+These calculations resulted to being consistent with those found from calling the python function with the same variables.
+
+
 \section{Reflection}
 \end{document}

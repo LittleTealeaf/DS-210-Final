@@ -12,7 +12,7 @@ def sigmoid(n):
         m - The value of n passed through the sigmoid function. If n is an array, then each value within n is passed through the sigmoid function
     """
     if isinstance(n,np.ndarray):
-        a = np.zeros(n.shape)
+        a = np.zeros(n.shape,dtype=n.dtype)
         for i in range(len(a)):
             a[i] = sigmoid(n[i])
         return a
@@ -27,6 +27,17 @@ def sigmoid_derivative(n):
         m - The value of n passed through the derivative of the sigmoid function. If n is an array, then each value within n is passed through the derivative of the sigmoid function
     """
     return sigmoid(n) * (1 - sigmoid(n))
+
+def feed_forward(Y,W):
+    """Feeds forward the values from a previous layer to the next layer closest to the output layer
+    
+    Inputs:
+    - Y: The previous layer values, as a matrix of size h x 1.
+    - W: The weight matrix, as a matrix of size k x h, where k is the number of nodes in the target layer
+    
+    Output:
+     - The resulting values of the nodes at the target layer"""
+    return sigmoid(W @ Y)
 
 def back_propagation(Y2: np.matrix, W1: np.matrix, W0: np.matrix, y_expected: np.double):
     """Back Propagation for a 2-layer neural network
@@ -44,11 +55,11 @@ def back_propagation(Y2: np.matrix, W1: np.matrix, W0: np.matrix, y_expected: np
     """
     dW1 = np.zeros(W1.shape)
     dW0 = np.zeros(W0.shape)
-    Y1 = sigmoid(W1 @ Y2)
-    Y0 = sigmoid(W0 @ Y1)
+    Y1 = feed_forward(Y2,W1)
+    Y0 = feed_forward(Y1,W0)
     Err = abs(Y0[0,0] - y_expected)
     for i in range(len(W1)):
-        dW0[0,i] = 2 * (Y0[0,0] - y_expected) * Y0[0,0] * (1 - Y0[0,0]) * Y1[i,0]
+        dW0[0,i] = 2 * (Y0[0,0] - y_expected ) * Y0[0,0] * (1 - Y0[0,0]) * Y1[i,0]
         for j in range(len(Y2)):
             dW1[i,j] = dW0[0,i] * W0[0,i] * (1 - Y1[i,0]) * Y2[j,0]
     return dW1,dW0,Err
@@ -140,28 +151,27 @@ def random_matrix(size,seed: int=None):
         np.random.seed(seed)
     return np.random.random_sample(size)
 
-class Experiment:
-    """A class that basically stores all the modifyable parameters of a given training, such that they can be tracked. This class is primarily used in running an automated experiment to find the optimal number of nodes in the hidden layer, iterations, and batch size."""
-    def __init__(self,inputs,outputs,seed,hidden_count,iterations,batch_size):
-        self.inputs = inputs
-        self.outputs = outputs
-        self.seed = seed
-        self.hidden_count = hidden_count
-        self.iterations = iterations
-        self.batch_size = batch_size
-        self.evaluation = -1
-        random.seed(seed)
-        self.W1 = random_matrix((hidden_count,42))
-        self.W0 = random_matrix((1,hidden_count))
+def perform_experiment():
+    class Experiment:
+        """A class that basically stores all the modifyable parameters of a given training, such that they can be tracked. This class is primarily used in running an automated experiment to find the optimal number of nodes in the hidden layer, iterations, and batch size."""
+        def __init__(self,inputs,outputs,seed,hidden_count,iterations,batch_size):
+            self.inputs = inputs
+            self.outputs = outputs
+            self.seed = seed
+            self.hidden_count = hidden_count
+            self.iterations = iterations
+            self.batch_size = batch_size
+            self.evaluation = -1
+            random.seed(seed)
+            self.W1 = random_matrix((hidden_count,42))
+            self.W0 = random_matrix((1,hidden_count))
 
-    def get_evaluation(self):
-        if(self.evaluation == -1):
-            W1,W0 = train_network(self.inputs,self.outputs,self.W1,self.W0,lambda n: 1.0 - n / self.iterations, self.iterations, self.batch_size, self.seed)
-            self.evaluation = evaluate_network(self.inputs, self.outputs, W1, W0)
-        return self.evaluation
+        def get_evaluation(self):
+            if(self.evaluation == -1):
+                W1,W0 = train_network(self.inputs,self.outputs,self.W1,self.W0,lambda n: 1.0 - n / self.iterations, self.iterations, self.batch_size, self.seed)
+                self.evaluation = evaluate_network(self.inputs, self.outputs, W1, W0)
+            return self.evaluation
 
-
-if __name__ == "__main__":
     in_data, out_data = get_data_full()
     
     seed = 31415926
@@ -181,3 +191,36 @@ if __name__ == "__main__":
             
     print(a.hidden_count, a.iterations, a.batch_size)
 
+
+def verification():
+    """
+    Runs verifications as seen in verification section of report
+    """
+    print("Verification Process:")
+    print("Testing Sigmoid Function:")
+    print("\tsigmoid(5):","Actual:",0.9933071490757153,"Found:",sigmoid(5))
+    print("\tsigmoid([5,10]):","Actual:",[0.9933071490757153,0.9999546021312976],"Found:",sigmoid(np.array([5.,10.])))
+
+    print("Testing Feed-Forward")
+    Y2 = np.array([[1.],[-1.]])
+    W1 = np.array([[1,0.5],[-1,0]])
+    W0 = np.array([[0.5,2]])
+    print("\tfeed_forward(Y2,W1)","Actual:",np.array([[0.6224593312018546],[0.2689414213699951]]),"Found:",feed_forward(Y2,W1))
+
+    print("Backwards Propagation:")
+    dW1,dW0,err = back_propagation(Y2,W1,W0,0.5)
+    print("Expected dW1:")
+    print(np.array([[0.009881773269086033,-0.009881773269086033],[.0330696826545844,-.0330696826545844]]))
+    print("Found dW1:")
+    print(dW1)
+    print("Expected dW0:")
+    print(np.array([[0.05234812610012824,0.02261766951463492]]))
+    print("Found dW0:")
+    print(dW0)
+    print("Expected Error:",0.2003809377121779)
+    print("Found Error:",err)
+
+
+
+if __name__ == "__main__":
+    verification()

@@ -10,7 +10,7 @@ def read_file(fileName: str):
     Output:
     - A matrix containing the raw data from the file.
     """
-    return np.loadtxt(fileName,dtype=float,delimiter=",",converters=generate_converters(43),skiprows=1)
+    return np.loadtxt(fileName,dtype=np.double,delimiter=",",converters=generate_converters(43),skiprows=1)
 
 def generate_converters(columnCount: int = 43):
     """Creates a generator that assigns each column number to use a lambda function that replaces the string with an associated number.
