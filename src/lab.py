@@ -28,17 +28,14 @@ def sigmoidDerivative(n):
     '''
     return sigmoid(n) * (1 - sigmoid(n))
 
-
-def forward_feeding(yIn, W):
-    '''
-    Feeds forwards a the input vector to the output
-
-    Input: yIn - A h-length vector of the initial input values
-    Input: W - An array or list of N Weight-Matrices of varying sizes. The index of the matrix should relate to the order at which they are closest to the output layer. The size of Wa should be i x j, where i is the number of nodes in that layer, and j is the number of nodes for the layer Wa+1. The last Weight-Matrix should be of size i x h
-
-    Output: Y - The resulting vector of values outputted by the neural network
-    '''
-    Y = np.copy(yIn,copy=True)
-    for i in range(len(W) - 1, -1, -1):
-        Y = sigmoid(W[i] @ Y)
-    return Y
+def backwards_propagation(Y2,W1_in,W0_in,S,y_actual):
+    W1 = np.copy(W1_in,copy = True)
+    W0 = np.copy(W0_in,copy = True)
+    Y1 = sigmoid(W1 @ Y2)
+    Y0 = sigmoid(W0 @ Y1)
+    for i in range(len(W1)):
+        deltaW = S * 2 * (Y0[0,0] - y_actual) * Y0[0,0] * (1 - Y0[0,0]) * Y1[i,0]
+        W0[0,i] = W0[0,i] + deltaW
+        for j in range(len(Y2)):
+            W1[i,j] = W1[i,j] + deltaW * W0[0,i] * (1 - Y1[i,0]) * Y2[j,0]
+    return (W1,W0)

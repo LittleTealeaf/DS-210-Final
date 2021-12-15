@@ -5,7 +5,7 @@
 \date{Fall 2021}
 \usepackage{amsmath}
 \usepackage{soul}
-\usepackage{algorithm2e}
+\usepackage[ruled,linesnumbered]{algorithm2e}
 \usepackage{listings}
 \usepackage{enumitem}
 \usepackage[margin=1in]{geometry}
@@ -44,17 +44,18 @@ I've sectioned off the design of the algorithms into the independant algorithms,
 In my neural network, we will use an activation function to condense the output of a node down to a [0-1] scale. In this lab, we will use a sigmoid function. Below is the sigmoid function and it's derivative.
 $$\sigma(n) = \frac{1}{1 + e^{-n}}$$
 $$\sigma'(n) = \sigma(n) \cdot (1 - \sigma(n))$$
+
 When using this function on a matrix or vector, we simply just apply the sigma function for all individual values in the matrix/vector. The pseudocode algorithms of these functions are as follows:
 
 \begin{algorithm}[H]
     \caption{$\sigma(n)$ function for both constants and matrices}
-    \KwIn{$A$, which can either be a constant, or a $n$ x $m$ matrix}
-    \KwOut{$B$, which is equivilant to $\sigma(A)$}
+    \KwIn{$A$ - which can either be a constant, or a $n$ x $m$ matrix}
+    \KwOut{$B$ - which is equivilant to $\sigma(A)$}
     \uIf{$A$ is a Matrix}{
-        $B = $new Matrix($n$ x $m$) of 0s\\
+        $B \gets $new Matrix($n$ x $m$) of 0s\\
         \For{$i = 0, 1, 2... n$}{
             \For{$j = 0, 1, 2... m$}{
-                $B[i][j] = \sigma(A[i,j])$
+                $B[i][j] \gets \sigma(A[i,j])$
             }
         }
         \Return{$B$}
@@ -68,68 +69,65 @@ When using this function on a matrix or vector, we simply just apply the sigma f
 The forward feeding algorithm is what we use in order to calculate the resulting number from a given input into the neural network. We are given an input layer: $\vec{y^2}$, and the following weight matrices $W^0$, $W^1$. Mathematically, the forward feeding algorithm is a recursive algorithm of the following structure:
 $$\vec{y^n} = \sigma(W_{n} \cdot \vec{y^{n+1}})$$
 Since we have two layers and an output layer, our function for the whole network is described as follows:
-$$y = \vec{y^0} = \sigma(W_0 \cdot \sigma(W_1 \cdot \vec{y^2}))$$
-The complete algorithm, which can support any number of layers, is described below:\\
-\begin{algorithm}[H]
-    \caption{Forward-Feeding Algorithm}
-    \KwIn{$Y_{\text{in}}$ - An $h$-length vector of the initial input values}
-    \KwIn{$W$ - An array or list of $N$ Weight-Matrices of varying sizes. The index of the matrix should relate to the order at which they are closest to the output layer. The size of $W^a$ should be $i$ x $j$, where $i$ is the number of nodes in that layer, and $j$ is the number of nodes for the layer $W^{a+1}$. The last Weight-Matrix should be of size $i$ x $h$}
-    \KwOut{$Y$ - The resulting vector of values outputted by the neural network}
-    $Y = \text{copy of } Y_{\text{in}}$\\
-    \For{$i = N-1, N-2... 1, 0$}{
-        $Y = \sigma(W^i \cdot Y$)
-    }
-    \Return{$Y$}
-\end{algorithm}
-The ability for this algorithm to account for any number of inputs allows us to reuse it, regardless of whether we want the result from one of the hidden nodes or the whole network.
+$$y = y^0_{0,0} = \sigma(W_0 \cdot \sigma(W_1 \cdot \vec{y^2}))_{0,0}$$
 \subsection{Loss Function}
 In order to measure the effectiveness of the function, we need to use a loss function that relates the output of the neural network to the expected result (from the data). We will use a simple loss function that takes the difference of these values, and then squares it to remove any negatives. We can use backwards propagation in order to change values to minimize this error, training the network to get our desired result.
 $$L = (y^0_0 - \hat{y})^2 = (y - \hat{y})^2$$
 
-\subsection{Derivative of Layer-0 Weights}
-In back propagation, we need to find the derivative of each of the weights in terms of the loss function. First, we need to find the derivative of the loss function with respect to the weights that connect the hidden layer with the output layer. The derivative can be simplified using the chain rule as follows:
-$$\frac{\delta L}{\delta w^0_{0,i}} = \frac{\delta L}{\delta y} \cdot \frac{\delta y}{\delta w^0_{0,i}}$$
-We can factor this out to be the following. 
-\newline
-For simplifcation, $\sigma(\ldots) = \sigma(\sum_i{(w^0_{0,i} \cdot \sigma(W^1 \cdot \vec{y^2})_{i,0})}) = y$.
-$$\frac{\delta L}{\delta w^0_{0,i}} = 2(y - \hat{y}) \cdot (\sigma'(\ldots)) \cdot (\sigma((W^1 \cdot \vec{y^2})_{i,0}))$$
-$$\frac{\delta L}{\delta w^0_{0,i}} = 2(y - \hat{y}) \cdot (\sigma(\ldots)(1 - \sigma(\ldots))) \cdot (\sigma(\sum_h{(w^1_{i,h} \cdot y^2_{h})})$$
-$$\frac{\delta L}{\delta w^0_{0,i}} = 2(y - \hat{y}) \cdot (y \cdot (1 - y)) \cdot (\sigma(\sum_h{(w^1_{i,h} y^2_{h})})$$
-$$\frac{\delta L}{\delta w^0_{0,i}} = 2(y - \hat{y}) \cdot (y - y^2) \cdot  (\sigma(\sum_h^{}{(w^1_{i,h} \cdot y^2_{h})})$$
-And because I couldn't resist it...
-$$\frac{\delta L}{\delta w^0_{0,i}} = \frac{2(y - \hat{y})(y - y^2)}{1 + e^{-(\sum_h^{}{(w^1_{i,h} *y^2_{h})})}}$$
-(I was about to factor it out even more...)
-% $$\frac{\delta L}{\delta w^0_{0,i}} = \frac{2(\sigma(W_0 \cdot \sigma(W_1 \cdot \vec{y^2})) - \hat{y})((\sigma(W_0 \cdot \sigma(W_1 \cdot \vec{y^2}))) - (\sigma(W_0 \cdot \sigma(W_1 \cdot \vec{y^2})))^2)}{1 + e^{-(\sum_h^{}{(w^1_{i,h} \cdot y^2_{h})})}}$$
+\subsection{$0^{\text{th}}$ Layer Weight Derivative}
+In back propagation, we need to find the derivative of each of the weights in terms of the loss function. First, we need to find the derivative of the loss function with respect to the weights that connect the hidden layer with the output layer.\\
+Given the following variables:
 
+$$y^1_{i,0} = \sigma(\sum_h{w^1_{i,h} \cdot y^2_{h,0}})$$
+$$y^0_{0,0} = \sigma(\sum_h{w^0_{0,h} \cdot y^1_{h,0}})$$
+We can calculate the derivative as follows:
+$$\frac{\delta L}{\delta w^0_{0,i}} = \frac{\delta L}{\delta y^0_{0,0}} \cdot \frac{\delta y^0_{0,0}}{\delta \sum_h{w^0_{0,h} \cdot y^1_{h,0}}} \cdot \frac{\delta \sum_h{w^0_{0,h} \cdot y^1_{h,0}}}{\delta w^0_{0,i}}$$
+$$\frac{\delta L}{\delta w^0_{0,i}} = 2 \cdot (y^0_{0,0} - \hat{y}) \cdot \sigma'(\sum_h{w^0_{0,h} \cdot y^1_{h,0}}) \cdot y^1_{i,0}$$
+$$\frac{\delta L}{\delta w^0_{0,i}} = 2 \cdot (y^0_{0,0} - \hat{y}) \cdot \sigma(\sum_h{w^0_{0,h} \cdot y^1_{h,0}}) \cdot (1 - \sigma(\sum_h{w^0_{0,h} \cdot y^1_{h,0}})) \cdot y^1_{i,0}$$
+$$\frac{\delta L}{\delta w^0_{0,i}} = 2\cdot (y^0_{0,0} - \hat{y}) \cdot y^0_{0,0} \cdot (1 - y^0_{0,0}) \cdot y^1_{i,0}$$
 
-
-\subsection{Derivative of Layer-1 Weights}
-Next, we need to find the derivative of each of the weights that connect the input layer to the hidden layer. We can write this derivative as follows:
-$$\frac{\delta L}{\delta w^1_{i,j}} = \frac{\delta L}{\delta w^0_{0,i}} \cdot \frac{\delta w^0_{0,i}}{\delta y^1_i} \cdot \frac{\delta y^1_i}{\delta w^1_{i,j}}$$
-Thus, with using $\frac{\delta L}{\delta w^0_{0,i}}$, we can derive $\frac{\delta L}{\delta w^1_{i,j}}$. We will keep $\frac{\delta L}{\delta w^0_{0,i}}$ as itself, since we will just be able to call it in our implementation.
-\newline
-For simplifcation, $\sigma(\ldots) = \sigma(W^1 \cdot \vec{y^2}) = y^1_i$.
-$$\frac{\delta L}{\delta w^1_{i,j}} = \frac{\delta L}{\delta w^0_{0,i}} \cdot (2(y-\hat{y})(y - y^2)(\sigma'(\ldots))) \cdot (w^1_{i,j} \cdot y^2_{j})$$
-$$\frac{\delta L}{\delta w^1_{i,j}} = \frac{\delta L}{\delta w^0_{0,i} } \cdot (2(y - \hat{y})(y - y^2)(\sigma(\ldots)(1 - \sigma(\ldots)))) \cdot (w^1_{i,j} \cdot y^2_{j})$$
-$$\frac{\delta L}{\delta w^1_{i,j}} = \frac{\delta L}{\delta w^0_{0,i}} \cdot (2(y - \hat{y})(y - y^2)(y^1_i (1 - y^1_i))) \cdot (w^1_{i,j} \cdot y^2_{j})$$
-$$\frac{\delta L}{\delta w^1_{i,j}} = \frac{\delta L}{\delta w^0_{0,i}} \cdot 2 \cdot (y - \hat{y}) \cdot (y - y^2) \cdot ((y^1_i) - (y^1_i)^2) \cdot (w^1_{i,j} \cdot y^2_{j})$$
-% WAIT WOULD WE HAVE THE FIRST SECTION WITH THE 2 AND SUCH CAUSE ISNT' THAT IN THE FIRST PART?
-% no wait it wouldn't be because dx of (2f(x))^2 = 2(2f(x)) * (2f'(x)) * 1(x^0)
+\subsection{$1^{\text{st}}$ Layer Weight Derivative}
+Next, we need to find the derivative of each of the weights that connect the input layer to the hidden layer. Given the following variables:
+$$y^1_{i,0} = \sigma(\sum_h{w^1_{i,h} \cdot y^2_{h,0}})$$
+$$y^0_{0,0} = \sigma(\sum_h{w^0_{0,h} \cdot y^1_{h,0}})$$
+We can calculate the derivative as the following:
+$$\frac{\delta L}{\delta w^1_{i,j}} = \frac{\delta L}{\delta y^0_{0,0}} \cdot \frac{\delta y^0_{0,0}}{\delta \sum_h{w^0_{0,h} \cdot y^1_{h,0}}} \cdot \frac{\delta \sum_h{w^0_{0,h} \cdot y^1_{h,0}}}{\delta y^1_{i,0}} \cdot \frac{\delta y^1_{i,0}}{\delta \sum_h{w^1_{i,h} \cdot y^2_h}} \cdot \frac{\delta \sum_h{w^1_{i,h} \cdot y^2_{h,0}}}{\delta w^1_{i,j}}$$
+$$\frac{\delta L}{\delta w^1_{i,j}} = 2\cdot (y^0_{0,0} - \hat{y}) \cdot \sigma'(\sum_h{w^0_{0,h} \cdot y^1_{h,0}}) \cdot w^0_{0,i} \cdot \sigma'(\sum_h{w^1_{i,h} \cdot y^2_{h,0}}) \cdot y^2_{j,0}$$
+$$\frac{\delta L}{\delta w^1_{i,j}} = 2 \cdot (y^0_{0,0} - \hat{y}) \cdot \sigma(\sum_h{w^0_{0,h} \cdot y^1_{h,0}}) \cdot (1 - \sigma(\sum_h{w^0_{0,h} \cdot y^1_{h,0}})) \cdot w^0_{0,i} \cdot \sigma(\sum_h{w^1_{i,h} \cdot y^2_{h,0}}) \cdot (1 - \sigma(\sum_h{w^1_{i,h} \cdot y^2_{h,0}})) \cdot  y^2_{j,0}$$
+$$\frac{\delta L}{\delta w^1_{i,j}} = 2 \cdot (y^0_{0,0} - \hat{y}) \cdot y^0_{0,0} \cdot (1 - y^0_{0,0}) \cdot w^0_{0,i} \cdot y^1_{i,0} \cdot (1 - y^1_{i,0}) \cdot y^2_{j,0}$$
+We can then reorder it as..
+$$\frac{\delta L}{\delta w^1_{i,j}} = 2 \cdot (y^0_{0,0} - \hat{y}) \cdot y^0_{0,0} \cdot (1 - y^0_{0,0})\cdot y^1_{i,0} \cdot w^0_{0,i}  \cdot (1 - y^1_{i,0}) \cdot y^2_{j,0}$$
+And substitute in the $0^{\text{th}}$ layer derivative!
+$$\frac{\delta L}{\delta w^1_{i,j}} = \frac{\delta L}{\delta w^0_{0,i}} \cdot w^0_{0,i}  \cdot (1 - y^1_{i,0}) \cdot y^2_{j,0} $$
 
 \subsection{Backwards Propagation}
-This is the heart of the whole lab project, backwards propagation. The goal of backwards propagation is to modify the values of the weights used in the neural network in order to "train" the network on a given output. Since we are trying to minimize the error term, we want to nudge the inputs in such a way that the output gets closer to the value we want. The algorithm below will iterate through a given. This algorithm is specifically designed for this given context, meaning it has been hard-coded for the 3 layer network that we have.\\
+This is the heart of the whole lab project, backwards propagation. The goal of backwards propagation is to modify the values of the weights used in the neural network in order to "train" the network on a given output. Since we are trying to minimize the error term, we want to nudge the inputs in such a way that the output gets closer to the value we want. The algorithm below will iterate through a given. This algorithm is specifically designed for this given context, meaning it has been hard-coded for the 3 layer network that we have.\newline
 \begin{algorithm}[H]
-    \caption{Backwards Propagation on a single input}
-    \KwIn{$Y$ - The input vector of the matrix, size $h$ x $1$
-    \newline$W^1$ - The weight matrix of the hidden layer, of dimensions $m$ x $h$. These are the weights of each of the inputs as they pass from the inputs to the hidden layer.
-    \newline$W^0$ - The weight matrix of the output layer, of dimensions $1$ x $m$. These are the weights applied to the values as they pass from the hidden layer to the output layer (which is size 1)
-    \newline$S$ - The step factor. This is the multiple that the "gradient" will be multiplied by in order to improve the network
-    \newline$\hat{Y}$ - The expected output of the neural network}
-    \KwOut{$W^1$ - The updated weight matrix of the hidden layer
-    \newline$W^0$ - The updated weight matrix of the output layer}
-
+    \caption{Backwards Propagation for a 2-layer neural network}
+    \KwIn{
+        $Y^2$ - The input vector (matrix), dimensions $m$ x $1$.\newline
+        $W^1_\text{in}$ - The weight matrix, dimensions $h$ x $m$, that represents the weights used as variables go from $Y^2 \rightarrow Y^0$\newline
+        $W^0_\text{in}$ - The weight matrix, dimensions $1$ x $h$, that represents the weights used as variables go from $Y^1 \rightarrow Y^0$\newline
+        $S$ - The step coefficient to modify weights by, as a scalar value.\newline
+        $\hat{y}$ - The expected result from Forward-Feeding
+    }
+    \KwOut{
+        $W^1$ - The modified weight matrix, describing the same thing as $W^1_\text{in}$\newline
+        $W^0$ - The modified weight matrix, describing the same thing as $W^0_\text{in}$
+    }
+    $W^1 \gets \text{copy of } W^1_\text{in}$\\
+    $W^0 \gets \text{copy of } W^0_\text{in}$\\
+    $Y^1 \gets \sigma(W^1 \cdot Y^2)$\\
+    $Y^0 \gets \sigma(W^0 \cdot Y^1)$\\
+    \For{$i \gets (0, 1, \ldots, h-1)$}{
+        $\Delta W^0 \gets S \cdot 2 \cdot (Y^0_{0,0} - \hat{y}) \cdot Y^0_{0,0} \cdot (1 - Y^0_{0,0}) \cdot Y^1_{i,0}$\\
+        $W^0_{0,i} \gets W^0_{0,i} + \Delta W^0$\\
+        \For{$j \gets (0, 1, \ldots, m-1)$}{
+            $W^1_{i,j} \gets W^1_{i,j} + \Delta W^0 \cdot W^0_{0,i}  \cdot (1 - y^1_{i,0}) \cdot y^2_{j,0}$
+        }
+    }
+    \Return{$W^1, W^0$}
 \end{algorithm}
-
 
 % Pseudocode, referenced previous algorithms (just include their pseudocode)
 \section{Implementation}
