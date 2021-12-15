@@ -115,8 +115,8 @@ if __name__ == "__main__":
     best = Experiment(in_data,out_data,seed,1,iterations,20)
 
     for iterations in range(1000,10000,500):
-        for hidden_count in range(1,50,1):
-            for batch_size in range(1,max(2 * best.batch_size,20),1):
+        for hidden_count in range(1,30,1):
+            for batch_size in range(1,max(2 * best.batch_size,50),1):
                 if best != None:
                     print("Testing: ",best.iterations,hidden_count,batch_size,"Best:",best.iterations,best.hidden_count,best.batch_size,best.get_evaluation())
                 a = Experiment(in_data,out_data,seed,hidden_count,iterations,batch_size)
