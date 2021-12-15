@@ -74,7 +74,7 @@ I used the following algorithm so that if I passed in a matrix, it would just ap
 
 \begin{algorithm}[H]
     \caption{$\sigma(n)$ function for both constants and matrices}
-    \KwIn{$A$ - which can either be a constant, or a $n$ x $m$ matrix}
+    \KwIn{$A$ - which can either be a constant, or an array, with the first dimension being length $n$}
     \KwOut{$\sigma(A)$ - The result of putting $A$ through the $\sigma()$ function}
     \uIf{$A$ is a Matrix (or array)}{
         $B \gets $new Matrix of 0s in the same shape as $A$\\
