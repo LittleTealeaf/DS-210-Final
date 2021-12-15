@@ -27,7 +27,11 @@
 \section{Background}
 \subsection{Goals}
 The main goal of this project is to create an algorithm that will predict whether or not a given player is considered winning in any given state of connect-4. To do this, I created a neural network that takes in a connect-4 board state (6 wide x 7 high), and outputs a single number between $[0,1]$ that represents the predicted confidence that player 1 is winning. To train the network, I will use a stochastic gradient descent algorithm, as well as a back propagation algorithm, in order to update the weights.
-\subsection{Mathematics Overview}
+\subsection{Mathematic Background}
+The process of modifying the weights is what drives the neural network to learn. Training it is an iterative process; Each iteration, we give the network a random sample of data to train off of. We then take the average "gradient" and modify the weights accordingly.\newline
+To describe it best, lets start from the ground up. First, we are given a neural network. A neural network is a "network" that partially mimics a neuron map. The network is divided into layers. For this project, we will use a neural network with 1 hidden layer. If you are confused about how a neural network actually functions, I suggest watching this video (\url{https://www.youtube.com/watch?v=aircAruvnKk}) by 3blue1brown on Youtube. He does a great job with providing a clean animation to describe what is actually happening.\newline
+
+
 % The process for modifying the weights goes as follows. First, we use the neural network to take a set of inputs and get the output. We then compare that to the expected value using a loss function. Using that loss function, we find the derivative of the loss function in relation to each individual weight. Since we want to minimize the loss function, we take the derivative of each weight, which points towards the direction of greatest ascent, and go in the opposite direction by some step size. We repeat this whole process with different data entries, gradually reducing the step size, approaching a point where the network can generally predict the correct value.\newline
 % In order to make the forward propagation, or calculating the output of a neural network from a given input, we placed the weights in matricies. The inputs are put in a vector, and the weights in a matrix. Each row of the weight matrix represents a node in that network layer, and each column represent the weight associated with one of the input variables.
 % For example, an example of a 2-layer network, that only contains an input and an output layer, is represented as follows:
@@ -100,7 +104,7 @@ If we substitute in all of our layers, we can get the following equation as the 
 $$y = y^0_{0,0} = \sigma(W_0 \cdot \sigma(W_1 \cdot \vec{y^2}))_{0,0}$$
 \subsection{Loss Function}
 In order to use gradient descent, we will need to create a function that measures the correctness of our network. This is known as the "Loss Function". The premise of the loss function is that the higher it is, the worse the network is. Therefore, in order to make our network more accurate, we need to minimize this value.
-$$L = (y^0_0 - \hat{y})^2 = (y - \hat{y})^2$$
+$$L = (\hat{y} - y^0_{0,0})^2 = (]\hat{y} - y)^2$$
 
 \subsection{0th Layer Weight Derivative}
 
@@ -111,9 +115,9 @@ $$y^1_{i,0} = \sigma(\sum_h{w^1_{i,h} \cdot y^2_{h,0}})$$
 $$y^0_{0,0} = \sigma(\sum_h{w^0_{0,h} \cdot y^1_{h,0}})$$
 We can calculate the derivative as follows:
 $$\frac{\delta L}{\delta w^0_{0,i}} = \frac{\delta L}{\delta y^0_{0,0}} \cdot \frac{\delta y^0_{0,0}}{\delta \sum_h{w^0_{0,h} \cdot y^1_{h,0}}} \cdot \frac{\delta \sum_h{w^0_{0,h} \cdot y^1_{h,0}}}{\delta w^0_{0,i}}$$
-$$\frac{\delta L}{\delta w^0_{0,i}} = 2 \cdot (y^0_{0,0} - \hat{y}) \cdot \sigma'(\sum_h{w^0_{0,h} \cdot y^1_{h,0}}) \cdot y^1_{i,0}$$
-$$\frac{\delta L}{\delta w^0_{0,i}} = 2 \cdot (y^0_{0,0} - \hat{y}) \cdot \sigma(\sum_h{w^0_{0,h} \cdot y^1_{h,0}}) \cdot (1 - \sigma(\sum_h{w^0_{0,h} \cdot y^1_{h,0}})) \cdot y^1_{i,0}$$
-$$\frac{\delta L}{\delta w^0_{0,i}} = 2\cdot (y^0_{0,0} - \hat{y}) \cdot y^0_{0,0} \cdot (1 - y^0_{0,0}) \cdot y^1_{i,0}$$
+$$\frac{\delta L}{\delta w^0_{0,i}} = 2 \cdot (\hat{y} - y^0_{0,0}) \cdot \sigma'(\sum_h{w^0_{0,h} \cdot y^1_{h,0}}) \cdot y^1_{i,0}$$
+$$\frac{\delta L}{\delta w^0_{0,i}} = 2 \cdot (\hat{y} - y^0_{0,0}) \cdot \sigma(\sum_h{w^0_{0,h} \cdot y^1_{h,0}}) \cdot (1 - \sigma(\sum_h{w^0_{0,h} \cdot y^1_{h,0}})) \cdot y^1_{i,0}$$
+$$\frac{\delta L}{\delta w^0_{0,i}} = 2\cdot (\hat{y} - y^0_{0,0}) \cdot y^0_{0,0} \cdot (1 - y^0_{0,0}) \cdot y^1_{i,0}$$
 
 \subsection{1st Layer Weight Derivative}
 Next, we need to find the derivative of each of the weights that connect the input layer to the hidden layer.\\
@@ -122,11 +126,11 @@ $$y^1_{i,0} = \sigma(\sum_h{w^1_{i,h} \cdot y^2_{h,0}})$$
 $$y^0_{0,0} = \sigma(\sum_h{w^0_{0,h} \cdot y^1_{h,0}})$$
 We can calculate the derivative as the following:
 $$\frac{\delta L}{\delta w^1_{i,j}} = \frac{\delta L}{\delta y^0_{0,0}} \cdot \frac{\delta y^0_{0,0}}{\delta \sum_h{w^0_{0,h} \cdot y^1_{h,0}}} \cdot \frac{\delta \sum_h{w^0_{0,h} \cdot y^1_{h,0}}}{\delta y^1_{i,0}} \cdot \frac{\delta y^1_{i,0}}{\delta \sum_h{w^1_{i,h} \cdot y^2_h}} \cdot \frac{\delta \sum_h{w^1_{i,h} \cdot y^2_{h,0}}}{\delta w^1_{i,j}}$$
-$$\frac{\delta L}{\delta w^1_{i,j}} = 2\cdot (y^0_{0,0} - \hat{y}) \cdot \sigma'(\sum_h{w^0_{0,h} \cdot y^1_{h,0}}) \cdot w^0_{0,i} \cdot \sigma'(\sum_h{w^1_{i,h} \cdot y^2_{h,0}}) \cdot y^2_{j,0}$$
-$$\frac{\delta L}{\delta w^1_{i,j}} = 2 \cdot (y^0_{0,0} - \hat{y}) \cdot \sigma(\sum_h{w^0_{0,h} \cdot y^1_{h,0}}) \cdot (1 - \sigma(\sum_h{w^0_{0,h} \cdot y^1_{h,0}})) \cdot w^0_{0,i} \cdot \sigma(\sum_h{w^1_{i,h} \cdot y^2_{h,0}}) \cdot (1 - \sigma(\sum_h{w^1_{i,h} \cdot y^2_{h,0}})) \cdot  y^2_{j,0}$$
-$$\frac{\delta L}{\delta w^1_{i,j}} = 2 \cdot (y^0_{0,0} - \hat{y}) \cdot y^0_{0,0} \cdot (1 - y^0_{0,0}) \cdot w^0_{0,i} \cdot y^1_{i,0} \cdot (1 - y^1_{i,0}) \cdot y^2_{j,0}$$
+$$\frac{\delta L}{\delta w^1_{i,j}} = 2\cdot (\hat{y} - y^0_{0,0}) \cdot \sigma'(\sum_h{w^0_{0,h} \cdot y^1_{h,0}}) \cdot w^0_{0,i} \cdot \sigma'(\sum_h{w^1_{i,h} \cdot y^2_{h,0}}) \cdot y^2_{j,0}$$
+$$\frac{\delta L}{\delta w^1_{i,j}} = 2 \cdot (\hat{y} - y^0_{0,0}) \cdot \sigma(\sum_h{w^0_{0,h} \cdot y^1_{h,0}}) \cdot (1 - \sigma(\sum_h{w^0_{0,h} \cdot y^1_{h,0}})) \cdot w^0_{0,i} \cdot \sigma(\sum_h{w^1_{i,h} \cdot y^2_{h,0}}) \cdot (1 - \sigma(\sum_h{w^1_{i,h} \cdot y^2_{h,0}})) \cdot  y^2_{j,0}$$
+$$\frac{\delta L}{\delta w^1_{i,j}} = 2 \cdot (\hat{y} - y^0_{0,0}) \cdot y^0_{0,0} \cdot (1 - y^0_{0,0}) \cdot w^0_{0,i} \cdot y^1_{i,0} \cdot (1 - y^1_{i,0}) \cdot y^2_{j,0}$$
 We can then reorder it as..
-$$\frac{\delta L}{\delta w^1_{i,j}} = 2 \cdot (y^0_{0,0} - \hat{y}) \cdot y^0_{0,0} \cdot (1 - y^0_{0,0})\cdot y^1_{i,0} \cdot w^0_{0,i}  \cdot (1 - y^1_{i,0}) \cdot y^2_{j,0}$$
+$$\frac{\delta L}{\delta w^1_{i,j}} = 2 \cdot (\hat{y} - y^0_{0,0}) \cdot y^0_{0,0} \cdot (1 - y^0_{0,0})\cdot y^1_{i,0} \cdot w^0_{0,i}  \cdot (1 - y^1_{i,0}) \cdot y^2_{j,0}$$
 And substitute in the $0^{\text{th}}$ layer derivative!
 $$\frac{\delta L}{\delta w^1_{i,j}} = \frac{\delta L}{\delta w^0_{0,i}} \cdot w^0_{0,i}  \cdot (1 - y^1_{i,0}) \cdot y^2_{j,0} $$
 
@@ -149,12 +153,12 @@ Backwards propagation is calculating the "gradient" of weights for a given input
     $\delta W^0 \gets$ new matrix of dimensions $1$ x $h$\\
     $Y^1 \gets \sigma(W^1 \cdot Y^2)$\\
     $Y^0 \gets \sigma(W^0 \cdot Y^1)$\\
-    $\text{Err} \gets | Y^0_{0,0} - \hat{y} |$\\
+    $\text{Err} \gets | \hat{y} - y^0_{0,0} |$\\
     \For{$i \gets (0, 1, \ldots, h-1)$}{
-        $\delta W^0_{0,i} \gets 2 \cdot (Y^0_{0,0} - \hat{y}) \cdot Y^0_{0,0} \cdot (1 - Y^0_{0,0}) \cdot Y^1_{i,0}$\\
+        $\delta W^0_{0,i} \gets 2 \cdot (\hat{y} - y^0_{0,0}) \cdot Y^0_{0,0} \cdot (1 - Y^0_{0,0}) \cdot Y^1_{i,0}$\\
 
         \For{$j \gets (0, 1, \ldots, m-1)$}{
-            $\delta W^1_{i,j} \cdot W^0_{0,i}  \cdot (1 - y^1_{i,0}) \cdot y^2_{j,0}$
+            $\delta W^1_{i,j} \gets \delta W^0_{0,i} \cdot W^0_{0,i}  \cdot (1 - y^1_{i,0}) \cdot y^2_{j,0}$
         }
     }
     \Return{$\delta W^1, \delta W^0,$ Err}
@@ -187,10 +191,10 @@ To update each of the weights, we take the average changes in the back propagati
         $\Delta W^0 \gets \Delta W^0 + \delta W^0$\\
         Err Total $\gets \text{Err Total} + \text{Err}$
     }
-    $\Delta W^1 \gets \eta / n \cdot \Delta W^1$\\
-    $\Delta W^0 \gets \eta / n \cdot \Delta W^0$\\
     Err Total $\gets \text{Err Total} / n$\\
-    \Return{$\Delta W^1, \Delta W^0, \text{Err Total}$}
+    $W^1 \gets W^1 -  \eta / n \cdot \Delta W^1$\\
+    $W^0 \gets W^0 - \eta / n \cdot \Delta W^0$\\
+    \Return{$W^1, W^0, \text{Err Total}$}
 \end{algorithm}
 
 \subsection{Training the Network}
@@ -198,21 +202,23 @@ Now, in order to train the network, I need to send in batches of data for it to 
 \begin{algorithm}[H]
     \caption{Neural Network Training Algorithm}
     \KwIn{
-        input - Length-$n$ list of input vectors, as matrices. Each input vector is of size $m$ x $1$\newline
-        output - Length-$n$ list of all expected values, as scalars. Each output corresponds to the input at that same index\newline
+        input - Length-$k$ list of input vectors, as matrices. Each input vector is of size $m$ x $1$\newline
+        output - Length-$k$ list of all expected values, as scalars. Each output corresponds to the input at that same index\newline
         $W^1$ - The weight matrix, dimensions $h$ x $m$, that represents the weights used as variables go from $Y^2 \rightarrow Y^0$\newline
         $W^0$ - The weight matrix, dimensions $h$ x $m$, that represents the weights used as variables go from $Y^2 \rightarrow Y^0$\newline
         $f(i, I)$ - Step size function, which when passed in a current iteration $i$, and total iteration count $I$, returns the step size for that iteration\newline
-        $I$ - The total number of iterations to run\newline
-        $c$ - The total number of inputs to feed into each iteration
+        $n$ - The total number of iterations to run\newline
+        $c$ - The total number of inputs to feed into each iteration\newline
+        $seed$ - the random seed to use in the random selection of inputs
     }
     \KwOut{
         $W^1$ - The updated weight matrix, dimensions $h$ x $m$, trained on the given inputs and outputs
         $W^0$ - The updated weight matrix, dimensions $1$ x $h$, trained on the given inputs and outputs
     }
+    \tcp{Set the random seed to seed here}
     \For{$i \gets 0, 1, \ldots, n-1$}{
         $\eta \gets f(i,I)$\\
-        indexes $\gets$ list of uniform-random indexes within the range $[0,n-1]$\\
+        indexes $\gets$ list of uniform-random indexes within the range $[0,n-1]$ using the seed $seed$\\
         input-iteration $\gets$ list of inputs at each corresponding index from indexes\\
         output-iteration $\gets$ list of outputs at each corresponding index from indexes\\
         $W^1, W^0, Err \gets$ Stochastic Gradient Descent of weights and step size for input-iteration and output-iteration\\
@@ -220,13 +226,9 @@ Now, in order to train the network, I need to send in batches of data for it to 
     }
     \Return{$W^1, W^0$}
 \end{algorithm}
-% Now, if you give the same input and expected output into the Backwards Propagation enough times, it's going to give you a network wtih 0\% error for that input. However, it will perform very poorly when tested against a different set of inputs.\newline
-% While we do have an abundance of trials that we are able to draw from (67,557 entries to be exact), we could simply run through each and every entry multiple times to get enough data. The question relies in how we manage our Step value, which should be large at first, and as it progresses, gets smaller and smaller. The way that the network is trained will be up to a bit of experimentation, which I will be experimenting with.
-
-% Pseudocode, referenced previous algorithms (just include their pseudocode)
 \section{Implementation}
 \subsection{Data Importing}
-Since the data was given in a string csv format, an additional python script was created to import the data into two matricies, one contianing the inputs and one contianing the expected outputs.
+Since the data was given in a .csv file type, an additional script was given 
 % Reference methods / describe code?
 \section{Validation}
 \section{Reflection}
