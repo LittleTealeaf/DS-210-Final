@@ -137,12 +137,12 @@ Backwards propagation is calculating the "gradient" of weights for a given input
     \caption{Back Propagation for a 2-layer neural network}
     \KwIn{
         $Y^2$ - The input vector (matrix), dimensions $m$ x $1$.\newline
-        $W^1$ - The weight matrix, dimensions $h$ x $m$, that represents the weights used as variables go from $Y^2 \rightarrow Y^0$\newline
-        $W^0$ - The weight matrix, dimensions $1$ x $h$, that represents the weights used as variables go from $Y^1 \rightarrow Y^0$\newline
+        $W^1$ - The weight matrix, dimensions $h$ x $m$, that represents the weights used as values go from $Y^2 \rightarrow Y^1$\newline
+        $W^0$ - The weight matrix, dimensions $1$ x $h$, that represents the weights used as values go from $Y^1 \rightarrow Y^0$\newline
         $\hat{y}$ - The expected result from Forward-Feeding
     }
     \KwOut{
-        $\delta W^1$ - A matrix of the derivatives of the weights in $W^1$, as a $n$ x $m$ matrix.\newline
+        $\delta W^1$ - A matrix of the derivatives of the weights in $W^1$, as a $h$ x $m$ matrix.\newline
         $\delta W^0$ - A matrix of the derivatives of the weights in $W^0$, as a $1$ x $h$ matrix.\newline
         Err - The absolute error of the network for this given input
     }
@@ -170,8 +170,8 @@ To update each of the weights, we take the average changes in the back propagati
     \KwIn{
         input - Length-$n$ list of input vectors, as matrices. Each input vector is of size $m$ x $1$\newline
         output - Length-$n$ list of all expected values, as scalars. Each output corresponds to the input at that same index\newline
-        $W^1$ - The weight matrix, dimensions $h$ x $m$, that represents the weights used as variables go from $Y^2 \rightarrow Y^0$\newline
-        $W^0$ - The weight matrix, dimensions $1$ x $h$, that represents the weights used as variables go from $Y^1 \rightarrow Y^0$\newline
+        $W^1$ - The weight matrix, dimensions $h$ x $m$, that represents the weights used as values go from $Y^2 \rightarrow Y^1$\newline
+        $W^0$ - The weight matrix, dimensions $1$ x $h$, that represents the weights used as values go from $Y^1 \rightarrow Y^0$\newline
         $\eta$ - The step coefficient to nudge the weights by.
     }
     \KwOut{
@@ -199,12 +199,12 @@ Now, in order to train the network, I need to send in batches of data for it to 
 \begin{algorithm}[H]
     \caption{Neural Network Training Algorithm}
     \KwIn{
-        input - Length-$k$ list of input vectors, as matrices. Each input vector is of size $m$ x $1$\newline
-        output - Length-$k$ list of all expected values, as scalars. Each output corresponds to the input at that same index\newline
-        $W^1$ - The weight matrix, dimensions $h$ x $m$, that represents the weights used as variables go from $Y^2 \rightarrow Y^0$\newline
-        $W^0$ - The weight matrix, dimensions $h$ x $m$, that represents the weights used as variables go from $Y^2 \rightarrow Y^0$\newline
+        input - Length-$n$ list of input vectors, as matrices. Each input vector is of size $m$ x $1$\newline
+        output - Length-$n$ list of all expected values, as scalars. Each output corresponds to the input at that same index\newline
+        $W^1$ - The weight matrix, dimensions $h$ x $m$, that represents the weights used as values go from $Y^2 \rightarrow Y^0$\newline
+        $W^0$ - The weight matrix, dimensions $h$ x $m$, that represents the weights used as values go from $Y^2 \rightarrow Y^0$\newline
         $f(i, I)$ - Step size function, which when passed in a current iteration $i$, and total iteration count $I$, returns the step size for that iteration\newline
-        $n$ - The total number of iterations to run\newline
+        $k$ - The total number of iterations to run\newline
         $c$ - The total number of inputs to feed into each iteration\newline
         $seed$ - the random seed to use in the random selection of inputs
     }
@@ -213,7 +213,7 @@ Now, in order to train the network, I need to send in batches of data for it to 
         $W^0$ - The updated weight matrix, dimensions $1$ x $h$, trained on the given inputs and outputs
     }
     \tcp{Set the random seed to seed here}
-    \For{$i \gets 0, 1, \ldots, n-1$}{
+    \For{$i \gets 0, 1, \ldots, k-1$}{
         $\eta \gets f(i,I)$\\
         indexes $\gets$ list of uniform-random indexes within the range $[0,n-1]$ using the seed $seed$\\
         input-iteration $\gets$ list of inputs at each corresponding index from indexes\\

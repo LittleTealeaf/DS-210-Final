@@ -114,18 +114,28 @@ def train_network(inputs,outputs,W1_in,W0_in,f_step,iteration_count,batch_size,s
     return W1,W0
 
 def evaluate_network(inputs,outputs,W1,W0):
+    """Evaluates the network based on the average absolute error across all entries.
+    
+    Inputs:
+    - inputs: length n list of all input vectors, as matrices. Each input vector is of size m x 1
+    - outputs: length n list of all expected values, as scalars. Each output corresponds to the input at that same index.
+    - W1: The weight matrix, of dimensions h x m, that represents the weights used as values go from Y2 to Y1.
+    - W0: The weight matrix, of dimensions 1 x h, that represents teh weights used as values go from Y1 to Y0.
+    
+    Outputs:
+    - Average absolute error across all inputs"""
     total_error = 0
     for i in range(len(inputs)):
         Y0 = sigmoid(W0 @ sigmoid(W1 @ inputs[i]))
         total_error = abs(Y0[0,0] - outputs[i])
     return total_error[0,0] / len(inputs)
 
-def random_matrix(size):
-    m = np.zeros(size)
-    for i in range(len(m)):
-        for j in range(len(m[i])):
-            m[i,j] = random.uniform(0,1)
-    return m
+def random_matrix(size,seed=random.random):
+    """Creates a matrix from a give size, comprised of random values betwen 0 and 1"""
+    if len(size) > 1:
+        return [random_matrix(list(size)[1:]) for i in range(size[0])]
+    else:
+        return [random.uniform(0,1) for i in range(size[0])]
 
 class Experiment:
     def __init__(self,inputs,outputs,seed,hidden_count,iterations,batch_size):
