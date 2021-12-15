@@ -75,13 +75,12 @@ I used the following algorithm so that if I passed in a matrix, it would just ap
 \begin{algorithm}[H]
     \caption{$\sigma(n)$ function for both constants and matrices}
     \KwIn{$A$ - which can either be a constant, or a $n$ x $m$ matrix}
-    \KwOut{$B$ - which is equivilant to $\sigma(A)$}
-    \uIf{$A$ is a Matrix}{
-        $B \gets $new Matrix($n$ x $m$) of 0s\\
+    \KwOut{$\sigma(A)$ - The result of putting $A$ through the $\sigma()$ function}
+    \uIf{$A$ is a Matrix (or array)}{
+        $B \gets $new Matrix of 0s in the same shape as $A$\\
         \For{$i = 0, 1, 2... n$}{
-            \For{$j = 0, 1, 2... m$}{
-                $B[i][j] \gets \sigma(A[i,j])$
-            }
+            \tcp{This works recursively until it reaches scalar values}
+            $B[i] \gets \sigma(A[i])$
         }
         \Return{$B$}
     }
