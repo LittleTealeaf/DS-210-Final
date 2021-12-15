@@ -136,10 +136,6 @@ def random_matrix(size,seed: int=None):
     Inputs:
     - size: tuple of dimensions for the matrix
     - seed (default = random): the seed to begin at"""
-    # if len(size) > 1:
-    #     return np.matrix([random_matrix(list(size)[1:]) for i in range(size[0])])
-    # else:
-    #     return np.matrix([random.uniform(0,1) for i in range(size[0])])
     if seed:
         np.random.seed(seed)
     return np.random.random_sample(size)
