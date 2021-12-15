@@ -130,15 +130,15 @@ dmypy.json
 
 
 # Latex
-.log
-.aux
-.fdb_latexmk
-.fls
-.synctex.gz
-.blg
-.bcf
-.bbl
-.run.xml
+*.log
+*.aux
+*.fdb_latexmk
+*.fls
+*.synctex.gz
+*.blg
+*.bcf
+*.bbl
+*.run.xml
 report/report.aux
 report/report.bbl
 report/report.bcf
@@ -148,3 +148,4 @@ report/report.fls
 report/report.run.xml
 report/report.synctex.gz
 report/report.toc
+report/report.out
