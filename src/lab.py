@@ -130,14 +130,22 @@ def evaluate_network(inputs,outputs,W1,W0):
         total_error = abs(Y0[0,0] - outputs[i])
     return total_error[0,0] / len(inputs)
 
-def random_matrix(size,seed=random.random):
-    """Creates a matrix from a give size, comprised of random values betwen 0 and 1"""
-    if len(size) > 1:
-        return [random_matrix(list(size)[1:]) for i in range(size[0])]
-    else:
-        return [random.uniform(0,1) for i in range(size[0])]
+def random_matrix(size,seed: int=None):
+    """Creates a matrix from a give size, comprised of random values betwen 0 and 1
+    
+    Inputs:
+    - size: tuple of dimensions for the matrix
+    - seed (default = random): the seed to begin at"""
+    # if len(size) > 1:
+    #     return np.matrix([random_matrix(list(size)[1:]) for i in range(size[0])])
+    # else:
+    #     return np.matrix([random.uniform(0,1) for i in range(size[0])])
+    if seed:
+        np.random.seed(seed)
+    return np.random.random_sample(size)
 
 class Experiment:
+    """A class that basically stores all the modifyable parameters of a given training, such that they can be tracked. This class is primarily used in running an automated experiment to find the optimal number of nodes in the hidden layer, iterations, and batch size."""
     def __init__(self,inputs,outputs,seed,hidden_count,iterations,batch_size):
         self.inputs = inputs
         self.outputs = outputs
