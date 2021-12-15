@@ -1,3 +1,4 @@
+from typing import Iterator
 import numpy as np
 import math
 import random
@@ -28,31 +29,6 @@ def sigmoid_derivative(n):
     """
     return sigmoid(n) * (1 - sigmoid(n))
 
-# def backwards_propagation(Y2,W1_in,W0_in,S,y_actual):
-#     """Calculates and returns updated weights after updating to minimize the loss function from a given input.
-#     Inputs:
-#         Y2 - The input vector, dimensions m x 1
-#         W1_in - The weight matrix, dimensions h x m, that represent the weights applied from the input layer to the 1st layer
-#         W0_in - The weight matrix, dimensions 1 x h, that represent the weights applied from the 1st layer to the 0st layer (output)
-#         S - The step coefficient, as a scalar, to modify how much change is made to the weights
-#         y_actual - The expected value of the neural network, as a scalar value between [0,1]
-#     Outputs:
-#         W^1 - The updated weights, dimensions h x m, that represent the weights applied from the input layer to the 1st layer
-#         W^0 - The updated weights, dimensions h x m, that represent the weights applied from the 1st layer to the 0st layer (output)
-#         Err - The absolute error, as a scalar value, of the predicted output and the actual output for the given input
-#     """
-#     W1 = np.copy(W1_in)
-#     W0 = np.copy(W0_in)
-#     Y1 = sigmoid(W1 @ Y2)
-#     Y0 = sigmoid(W0 @ Y1)
-#     Err = abs(Y0[0,0] - y_actual)
-#     for i in range(len(W1)):
-#         deltaW = -1 * S * 2 * (Y0[0,0] - y_actual) * Y0[0,0] * (1 - Y0[0,0]) * Y1[i,0]
-#         W0[0,i] = W0[0,i] + deltaW
-#         for j in range(len(Y2)):
-#             W1[i,j] = W1[i,j] + deltaW * W0[0,i] * (1 - Y1[i,0]) * Y2[j,0]
-#     return (W1,W0,Err)
-
 def back_propagation(Y2, W1, W0, y_expected):
     dW1 = np.zeros(W1.shape)
     dW0 = np.zeros(W0.shape)
@@ -60,7 +36,7 @@ def back_propagation(Y2, W1, W0, y_expected):
     Y0 = sigmoid(W0 @ Y1)
     Err = abs(Y0[0,0] - y_expected)
     for i in range(len(W1)):
-        dW0[0,i] = 2 * (y_expected - Y0[0,0]) * Y0[0,0] * (1 - Y0[0,0]) * Y1[i,0]
+        dW0[0,i] = 2 * (Y0[0,0] - y_expected) * Y0[0,0] * (1 - Y0[0,0]) * Y1[i,0]
         for j in range(len(Y2)):
             dW1[i,j] = dW0[0,i] * W0[0,i] * (1 - Y1[i,0]) * Y2[j,0]
     return dW1,dW0,Err
@@ -81,7 +57,9 @@ def stochastic_descent(inputs,outputs,W1,W0,step):
     W0 = W0 - DW0 * step / len(inputs)
     return W1, W0, Err_total
 
-def train_network(inputs,outputs,W1,W0,f_step,n,c,seed):
+def train_network(inputs,outputs,W1_in,W0_in,f_step,n,c,seed):
+    W1 = W1_in
+    W0 = W0_in
     random.seed(seed)
     for i in range(n):
         step = f_step(i,n)
@@ -89,8 +67,15 @@ def train_network(inputs,outputs,W1,W0,f_step,n,c,seed):
         input_iteration = [inputs[j] for j in indexes]
         output_iteration = [outputs[j] for j in indexes]
         W1,W0,Err = stochastic_descent(input_iteration,output_iteration,W1,W0,step)
-        print("Error:",Err)
+        # print("Error:",Err)
     return W1,W0
+
+def evaluate_network(inputs,outputs,W1,W0):
+    total_error = 0
+    for i in range(len(inputs)):
+        Y0 = sigmoid(W0 @ sigmoid(W1 @ inputs[i]))
+        total_error = abs(Y0[0,0] - outputs[i])
+    return total_error / len(inputs)
 
 def random_matrix(size):
     m = np.zeros(size)
@@ -99,11 +84,57 @@ def random_matrix(size):
             m[i,j] = random.uniform(0,1)
     return m
 
+class Experiment:
+    def __init__(self,inputs,outputs,seed,hidden_count,iterations,batch_size):
+        self.inputs = inputs
+        self.outputs = outputs
+        self.seed = seed
+        self.hidden_count = hidden_count
+        self.iterations = iterations
+        self.batch_size = batch_size
+        self.evaluation = -1
+        random.seed(seed)
+        self.W1 = random_matrix((hidden_count,42))
+        self.W0 = random_matrix((1,hidden_count))
+
+    def get_evaluation(self):
+        if(self.evaluation == -1):
+            W1,W0 = train_network(self.inputs,self.outputs,self.W1,self.W0,lambda n,i: 1.0 - n / i, self.iterations, self.batch_size, self.seed)
+            self.evaluation = evaluate_network(self.inputs, self.outputs, W1, W0)
+        return self.evaluation
+
 
 if __name__ == "__main__":
     in_data, out_data = get_data_full()
     in_data = [np.array([[j] for j in i]) for i in in_data]
-    hidden_count = 5
-    W1 = random_matrix((hidden_count,42))
-    W0 = random_matrix((1,hidden_count))
-    train_network(in_data,out_data,W1,W0,lambda n,i: 1.0 - n / i, 100,100000,1111)
+    
+    seed = 1024
+
+    iterations = 1000
+
+    best = None
+
+    for hidden_count in range(1,100,1):
+        for batch_size in range(1,100,5):
+            if best != None:
+                 print("Testing: ",hidden_count,batch_size,"Best:",best.hidden_count,best.batch_size,best.get_evaluation())
+            a = Experiment(in_data,out_data,seed,hidden_count,iterations,batch_size)
+            if (best == None) or (best.get_evaluation() > a.get_evaluation()):
+                best = a
+            
+    print(a.hidden_count, a.iterations, a.batch_size)
+
+    # hidden_count = 25
+    # iterations = 10000
+    # batch_size = 5
+    # seed = 32156
+
+
+    # W1 = random_matrix((hidden_count,42))
+    # W0 = random_matrix((1,hidden_count))
+    # W1,W0 = train_network(in_data,out_data,W1,W0,lambda n,i: 1.0 - n / i, iterations,batch_size,seed)
+    # # print(W1)
+    # # print(W0)
+    # print("Evlatuation:",evaluate_network(in_data,out_data,W1,W0))
+
+
