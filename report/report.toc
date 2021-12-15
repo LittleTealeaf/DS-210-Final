@@ -1,14 +1,15 @@
-\contentsline {section}{\numberline {1}Background}{2}%
-\contentsline {subsection}{\numberline {1.1}Goals}{2}%
-\contentsline {section}{\numberline {2}Design}{2}%
-\contentsline {subsection}{\numberline {2.1}Sigmoid Activation Function}{2}%
-\contentsline {subsection}{\numberline {2.2}Feed-Forward Algorithm}{3}%
-\contentsline {subsection}{\numberline {2.3}Loss Function}{3}%
-\contentsline {subsection}{\numberline {2.4}$0^{\text {th}}$ Layer Weight Derivative}{3}%
-\contentsline {subsection}{\numberline {2.5}$1^{\text {st}}$ Layer Weight Derivative}{4}%
-\contentsline {subsection}{\numberline {2.6}Backward Propagation}{4}%
-\contentsline {subsection}{\numberline {2.7}Training the Network}{5}%
-\contentsline {section}{\numberline {3}Implementation}{5}%
-\contentsline {subsection}{\numberline {3.1}Data Importing}{5}%
-\contentsline {section}{\numberline {4}Validation}{6}%
-\contentsline {section}{\numberline {5}Reflection}{6}%
+\contentsline {section}{\numberline {1}Background}{2}{}%
+\contentsline {subsection}{\numberline {1.1}Goals}{2}{}%
+\contentsline {subsection}{\numberline {1.2}Mathematics Overview}{2}{}%
+\contentsline {section}{\numberline {2}Design}{2}{}%
+\contentsline {subsection}{\numberline {2.1}Sigmoid Activation Function}{3}{}%
+\contentsline {subsection}{\numberline {2.2}Feed-Forward Algorithm}{3}{}%
+\contentsline {subsection}{\numberline {2.3}Loss Function}{3}{}%
+\contentsline {subsection}{\numberline {2.4}$0^{\text {th}}$ Layer Weight Derivative}{4}{}%
+\contentsline {subsection}{\numberline {2.5}$1^{\text {st}}$ Layer Weight Derivative}{4}{}%
+\contentsline {subsection}{\numberline {2.6}Backward Propagation}{5}{}%
+\contentsline {subsection}{\numberline {2.7}Training the Network}{5}{}%
+\contentsline {section}{\numberline {3}Implementation}{6}{}%
+\contentsline {subsection}{\numberline {3.1}Data Importing}{6}{}%
+\contentsline {section}{\numberline {4}Validation}{6}{}%
+\contentsline {section}{\numberline {5}Reflection}{6}{}%

@@ -25,7 +25,14 @@
 % These sections are good for a start, however change them up as needed
 \section{Background}
 \subsection{Goals}
-The main goal of this project is to create an algorithm that will be able to predict whether or not a player will win, from a given position on a Connect-4 board. To create an algorithm that does this, I used a neural network 
+The main goal of this project is to create an algorithm that will be able to predict whether or not a player will win, from a given position on a Connect-4 board. To create an algorithm that does this, I used a neural network structure, which I trained specifically to do this calculation. To train the neural network, I used Stochastic Steepest Descent, and Back-Propagation as algorithms in order to "train" the network into accurately predicting if player 1 will win.
+\subsection{Mathematics Overview}
+The process for modifying the weights goes as follows. First, we use the neural network to take a set of inputs and get the output. We then compare that to the expected value using a loss function. Using that loss function, we find the derivative of the loss function in relation to each individual weight. Since we want to minimize the loss function, we take the derivative of each weight, which points towards the direction of greatest ascent, and go in the opposite direction by some step size. We repeat this whole process with different data entries, gradually reducing the step size, approaching a point where the network can generally predict the correct value.\newline
+In order to make the forward propagation, or calculating the output of a neural network from a given input, we placed the weights in matricies. The inputs are put in a vector, and the weights in a matrix. Each row of the weight matrix represents a node in that network layer, and each column represent the weight associated with one of the input variables.
+For example, an example of a 2-layer network, that only contains an input and an output layer, is represented as follows:
+$$\begin{bmatrix} 1 & 2 \\ 2 & 1\end{bmatrix}\begin{pmatrix}1\\4\end{pmatrix} = \begin{pmatrix}9 \\ 6\end{pmatrix}$$
+Where the first value is the weights, the second value is the input vector, and the last value is the output vector. When there are multiple layers, these are just recursively chained onto eachother. Each step of the way they are also normalized using a sigma function, which is described later in the design process.
+\subsection{Dataset}
 
 
 \section{Design}
@@ -40,7 +47,7 @@ During this section, a variety of variables and variable syntax will be used. Th
 \end{description}
 
 I've sectioned off the design of the algorithms into the independant algorithms, ordering them to try and explain the progression of deriving the algorithms. 
-
+This will take some experimentation, but the first idea is to 
 \subsection{Sigmoid Activation Function}
 In neural networks, an activation function is typically used to to condense the output of a node down to a [0-1] scale. In this lab, I used a sigmoid function. Below is the sigmoid function and it's derivative.
 $$\sigma(n) = \frac{1}{1 + e^{-n}}$$
@@ -136,7 +143,7 @@ Additionally, we will also calculate the absolute error of the propagation, whic
 
 \subsection{Training the Network}
 Now, if you give the same input and expected output into the Backwards Propagation enough times, it's going to give you a network wtih 0\% error for that input. However, it will perform very poorly when tested against a different set of inputs.\newline
-While we do have an abundance of trials that we are able to draw from (67,557 entries to be exact), we could simply run through each and every entry multiple times to get enough data. The question relies in how we manage our Step value, which should be large at first, and as it progresses, gets smaller and smaller. This will take some experimentation, but the first idea is to 
+While we do have an abundance of trials that we are able to draw from (67,557 entries to be exact), we could simply run through each and every entry multiple times to get enough data. The question relies in how we manage our Step value, which should be large at first, and as it progresses, gets smaller and smaller. The way that the network is trained will be up to a bit of experimentation, which I will be experimenting with.
 
 % Pseudocode, referenced previous algorithms (just include their pseudocode)
 \section{Implementation}
