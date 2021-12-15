@@ -34,7 +34,7 @@ def backwards_propagation(Y2,W1_in,W0_in,S,y_actual):
     Y1 = sigmoid(W1 @ Y2)
     Y0 = sigmoid(W0 @ Y1)
     for i in range(len(W1)):
-        deltaW = S * 2 * (Y0[0,0] - y_actual) * Y0[0,0] * (1 - Y0[0,0]) * Y1[i,0]
+        deltaW = -1 * S * 2 * (Y0[0,0] - y_actual) * Y0[0,0] * (1 - Y0[0,0]) * Y1[i,0]
         W0[0,i] = W0[0,i] + deltaW
         for j in range(len(Y2)):
             W1[i,j] = W1[i,j] + deltaW * W0[0,i] * (1 - Y1[i,0]) * Y2[j,0]

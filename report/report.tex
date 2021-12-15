@@ -76,7 +76,7 @@ $$L = (y^0_0 - \hat{y})^2 = (y - \hat{y})^2$$
 
 \subsection{$0^{\text{th}}$ Layer Weight Derivative}
 In back propagation, we need to find the derivative of each of the weights in terms of the loss function. First, we need to find the derivative of the loss function with respect to the weights that connect the hidden layer with the output layer.\\
-Given the following variables:
+Given the following equations:
 
 $$y^1_{i,0} = \sigma(\sum_h{w^1_{i,h} \cdot y^2_{h,0}})$$
 $$y^0_{0,0} = \sigma(\sum_h{w^0_{0,h} \cdot y^1_{h,0}})$$
@@ -87,7 +87,8 @@ $$\frac{\delta L}{\delta w^0_{0,i}} = 2 \cdot (y^0_{0,0} - \hat{y}) \cdot \sigma
 $$\frac{\delta L}{\delta w^0_{0,i}} = 2\cdot (y^0_{0,0} - \hat{y}) \cdot y^0_{0,0} \cdot (1 - y^0_{0,0}) \cdot y^1_{i,0}$$
 
 \subsection{$1^{\text{st}}$ Layer Weight Derivative}
-Next, we need to find the derivative of each of the weights that connect the input layer to the hidden layer. Given the following variables:
+Next, we need to find the derivative of each of the weights that connect the input layer to the hidden layer.\\
+Given the following equations:
 $$y^1_{i,0} = \sigma(\sum_h{w^1_{i,h} \cdot y^2_{h,0}})$$
 $$y^0_{0,0} = \sigma(\sum_h{w^0_{0,h} \cdot y^1_{h,0}})$$
 We can calculate the derivative as the following:
@@ -120,7 +121,7 @@ This is the heart of the whole lab project, backwards propagation. The goal of b
     $Y^1 \gets \sigma(W^1 \cdot Y^2)$\\
     $Y^0 \gets \sigma(W^0 \cdot Y^1)$\\
     \For{$i \gets (0, 1, \ldots, h-1)$}{
-        $\Delta W^0 \gets S \cdot 2 \cdot (Y^0_{0,0} - \hat{y}) \cdot Y^0_{0,0} \cdot (1 - Y^0_{0,0}) \cdot Y^1_{i,0}$\\
+        $\Delta W^0 \gets -S \cdot 2 \cdot (Y^0_{0,0} - \hat{y}) \cdot Y^0_{0,0} \cdot (1 - Y^0_{0,0}) \cdot Y^1_{i,0}$\\
         $W^0_{0,i} \gets W^0_{0,i} + \Delta W^0$\\
         \For{$j \gets (0, 1, \ldots, m-1)$}{
             $W^1_{i,j} \gets W^1_{i,j} + \Delta W^0 \cdot W^0_{0,i}  \cdot (1 - y^1_{i,0}) \cdot y^2_{j,0}$
@@ -128,6 +129,9 @@ This is the heart of the whole lab project, backwards propagation. The goal of b
     }
     \Return{$W^1, W^0$}
 \end{algorithm}
+
+\subsection{Training the Network}
+To train the network, we are basically going to 
 
 % Pseudocode, referenced previous algorithms (just include their pseudocode)
 \section{Implementation}
