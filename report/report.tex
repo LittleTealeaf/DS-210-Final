@@ -5,6 +5,7 @@
 \date{Fall 2021}
 \usepackage{amsmath}
 \usepackage{soul}
+\usepackage{hyperref}
 \usepackage[ruled,linesnumbered]{algorithm2e}
 \usepackage{listings}
 \usepackage{enumitem}
@@ -32,7 +33,24 @@ In order to make the forward propagation, or calculating the output of a neural 
 For example, an example of a 2-layer network, that only contains an input and an output layer, is represented as follows:
 $$\begin{bmatrix} 1 & 2 \\ 2 & 1\end{bmatrix}\begin{pmatrix}1\\4\end{pmatrix} = \begin{pmatrix}9 \\ 6\end{pmatrix}$$
 Where the first value is the weights, the second value is the input vector, and the last value is the output vector. When there are multiple layers, these are just recursively chained onto eachother. Each step of the way they are also normalized using a sigma function, which is described later in the design process.
+
 \subsection{Dataset}
+
+In order to train the network to evaluate a state of a connect-4 game, I used a dataset of connect-4 games, which provided a list of connect-4 game states, and the resulting value of the game.
+\begin{quote}
+    John Tromp. (1995). Connect-4 \url{https://archive.ics.uci.edu/ml/datasets/Connect-4}. Irvine, CA: University of California, School of Information and Computer Science.
+\end{quote}
+The dataset contains 67,557 entries, each one representing a state in a game of Connect-4. As decribed on the database page:
+\begin{quote}
+    This database contains all legal 8-ply positions in the game of connect-4 in which neither player has won yet, and in which the next move is not forced.\\
+x is the first player; o the second.\\
+The outcome class is the game theoretical value for the first player.
+\end{quote}
+The data is stored in a .csv file. Each row of the dataset represents a legal position. Each row is composed of 43 comma separated variables. The first 42 variables represent the board state, and teh last one represents the expected value of whether player 1 wins, loses or draws.\newline
+For the board position, there are three possible states. 'x' means that the first player has placed a piece in that square. 'o' indicates that the second player has placed their piece in that square. 'b' indicates that the square is vacant.\newline
+There are three possible "results" of the board state. "win" means that player 1 is expected to win from this game state. "lose" means that player 2 is expected to win from this game state. "draw" means that neither player is expected to win, or that the board will be completely filled before any player can get 4 in a row.
+
+
 
 \section{Design}
 During this section, a variety of variables and variable syntax will be used. The following is a list that explains each variable. Remember that for a given "layer", the output is considered the 0th layer, the hidden layer is considered the 1st layer, and the input is considered the 2nd layer.
