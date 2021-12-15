@@ -138,7 +138,7 @@ def evaluate_network(inputs,outputs,W1,W0):
     total_error = 0
     for i in range(len(inputs)):
         Y0 = sigmoid(W0 @ sigmoid(W1 @ inputs[i]))
-        total_error = abs(Y0[0,0] - outputs[i])
+        total_error += abs(Y0[0,0] - outputs[i])
     return total_error[0,0] / len(inputs)
 
 def random_matrix(size,seed: int=None):
@@ -178,17 +178,17 @@ def perform_experiment():
 
     iterations = 1000
 
-    best = Experiment(in_data,out_data,seed,1,iterations,20)
+    best = Experiment(in_data,out_data,seed,23,1000,1)
 
     for iterations in range(1000,10000,1000):
         for hidden_count in range(1,40,1):
             for batch_size in range(1,max(2 * best.batch_size,30),1):
-                if best != None:
-                    print("Testing: ",best.iterations,hidden_count,batch_size,"Best:",best.iterations,best.hidden_count,best.batch_size,best.get_evaluation())
                 a = Experiment(in_data,out_data,seed,hidden_count,iterations,batch_size)
                 if (best == None) or (best.get_evaluation() > a.get_evaluation()):
                     best = a
+                print("Tested:",a.iterations,a.hidden_count,a.batch_size,a.get_evaluation()," \tBest:",best.iterations,best.hidden_count,best.batch_size,best.get_evaluation())
             
+    # prev best: Best: 1000 23 1 5.404723143044208e-06
     print(a.hidden_count, a.iterations, a.batch_size)
 
 
@@ -223,4 +223,4 @@ def verification():
 
 
 if __name__ == "__main__":
-    verification()
+    perform_experiment()
