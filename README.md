@@ -1,5 +1,5 @@
 # Data-Science-210-Final
-Stochastic Steepest Descent and Backpropagation Lab
+Stochastic Steepest Descent and Back-propagation Lab
 
 ## Project Navigation
 - [Project Instructions](FinalProject_Instructions.pdf)
