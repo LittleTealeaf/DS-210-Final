@@ -108,13 +108,13 @@ if __name__ == "__main__":
     in_data, out_data = get_data_full()
     in_data = [np.array([[j] for j in i]) for i in in_data]
     
-    seed = 1024
+    seed = 31415926
 
     iterations = 1000
 
     best = Experiment(in_data,out_data,seed,1,iterations,20)
 
-    for hidden_count in range(1,100,1):
+    for hidden_count in range(1,50,1):
         for batch_size in range(1,2 * best.batch_size,1):
             if best != None:
                  print("Testing: ",hidden_count,batch_size,"Best:",best.hidden_count,best.batch_size,best.get_evaluation())
