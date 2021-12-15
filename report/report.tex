@@ -24,28 +24,29 @@
 
 % These sections are good for a start, however change them up as needed
 \section{Background}
-% State Algorithm chosen and state what task we'll compete
-% Brief outline on mathmatics behind algorithm
-% Summary of Dataset
+\subsection{Goals}
+The main goal of this project is to create an algorithm that will be able to predict whether or not a player will win, from a given position on a Connect-4 board. To create an algorithm that does this, I used a neural network 
+
+
 \section{Design}
 During this section, a variety of variables and variable syntax will be used. The following is a list that explains each variable. Remember that for a given "layer", the output is considered the 0th layer, the hidden layer is considered the 1st layer, and the input is considered the 2nd layer.
 \begin{description}[style=nextline]
-    \item[$\vec{y}^n$] The output values of the nodes in the $n^{\text{th}}$ hidden layer. 
-    \item[$y^n_i$] The output value of node $i$ in the $n^{\text{th}}$ hidden layer.
-    \item[$y$] By default, if y is left alone, it represents the output value, known as $y^0_0$ 
-    \item[$\hat{y}$] The expected final output 
-    \item[$W^n$] The weight matrix for a given layer $n$, as it applies to the values $\vec{y}^{n+1}$ (the outputs of the previous layer) 
+    \item[$y^n$] The output vector of the nodes in the $n^{\text{th}}$ hidden layer. 
+    \item[$y^n_{i,0}$] The output value of node $i$ in the $n^{\text{th}}$ hidden layer.
+    \item[$y$] By default, if y is left alone, it represents the output value, known as $y^0_{0,0}$ 
+    \item[$\hat{y}$] The expected final output as a scalar value
+    \item[$W^n$] The weight matrix for a given layer $n$, as it applies to the values $Y^{n+1}$ (the outputs of the previous layer) 
     \item[$w^n_{i,j}$] The weight value for the value passed from node $j$ of layer $n+1$ as it is passed to node $i$ of layer $n$
 \end{description}
 
 I've sectioned off the design of the algorithms into the independant algorithms, ordering them to try and explain the progression of deriving the algorithms. 
 
 \subsection{Sigmoid Activation Function}
-In my neural network, we will use an activation function to condense the output of a node down to a [0-1] scale. In this lab, we will use a sigmoid function. Below is the sigmoid function and it's derivative.
+In neural networks, an activation function is typically used to to condense the output of a node down to a [0-1] scale. In this lab, I used a sigmoid function. Below is the sigmoid function and it's derivative.
 $$\sigma(n) = \frac{1}{1 + e^{-n}}$$
 $$\sigma'(n) = \sigma(n) \cdot (1 - \sigma(n))$$
 
-When using this function on a matrix or vector, we simply just apply the sigma function for all individual values in the matrix/vector. The pseudocode algorithms of these functions are as follows:
+I used the following algorithm so that if I passed in a matrix, it would just apply the sigmoid function to each value in the matrix.
 
 \begin{algorithm}[H]
     \caption{$\sigma(n)$ function for both constants and matrices}
@@ -65,13 +66,13 @@ When using this function on a matrix or vector, we simply just apply the sigma f
     }
 \end{algorithm}
 
-\subsection{Forward Feeding Algorithm}
-The forward feeding algorithm is what we use in order to calculate the resulting number from a given input into the neural network. We are given an input layer: $\vec{y^2}$, and the following weight matrices $W^0$, $W^1$. Mathematically, the forward feeding algorithm is a recursive algorithm of the following structure:
+\subsection{Feed-Forward Algorithm}
+The Feed-Forward algorithm is the algorithm used to "run" a neural network. This is one of the fundamental steps in how a neural network works. This step is used whenever you want to find the output that a neural network will calculate from a given set of inputs. Since the neural network is siplit into 3 layers, the transition of the values from one layer to the next can be described as:
 $$\vec{y^n} = \sigma(W_{n} \cdot \vec{y^{n+1}})$$
-Since we have two layers and an output layer, our function for the whole network is described as follows:
+If we substitute in all of our layers, we can get the following equation as the result of the entire network.
 $$y = y^0_{0,0} = \sigma(W_0 \cdot \sigma(W_1 \cdot \vec{y^2}))_{0,0}$$
 \subsection{Loss Function}
-In order to measure the effectiveness of the function, we need to use a loss function that relates the output of the neural network to the expected result (from the data). We will use a simple loss function that takes the difference of these values, and then squares it to remove any negatives. We can use backwards propagation in order to change values to minimize this error, training the network to get our desired result.
+In order to use gradient descent, we will need to create a function that measures the correctness of our network. This is known as the "Loss Function". The premise of the loss function is that the higher it is, the worse the network is. Therefore, in order to make our network more accurate, we need to minimize this value.
 $$L = (y^0_0 - \hat{y})^2 = (y - \hat{y})^2$$
 
 \subsection{$0^{\text{th}}$ Layer Weight Derivative}
@@ -101,10 +102,11 @@ $$\frac{\delta L}{\delta w^1_{i,j}} = 2 \cdot (y^0_{0,0} - \hat{y}) \cdot y^0_{0
 And substitute in the $0^{\text{th}}$ layer derivative!
 $$\frac{\delta L}{\delta w^1_{i,j}} = \frac{\delta L}{\delta w^0_{0,i}} \cdot w^0_{0,i}  \cdot (1 - y^1_{i,0}) \cdot y^2_{j,0} $$
 
-\subsection{Backwards Propagation}
-This is the heart of the whole lab project, backwards propagation. The goal of backwards propagation is to modify the values of the weights used in the neural network in order to "train" the network on a given output. Since we are trying to minimize the error term, we want to nudge the inputs in such a way that the output gets closer to the value we want. The algorithm below will iterate through a given. This algorithm is specifically designed for this given context, meaning it has been hard-coded for the 3 layer network that we have.\newline
+\subsection{Backward Propagation}
+Backward Propagation is the whole accumilation of the previous algorithms to train a neural network. First, the Backward Propagation algorithm calculates the results of the network. After doing so, it calculates the partial derivatives of the loss function in relation to each of the weights (using the Layer Weight Derivatives above). Using these derivatives, it nudges the weights according to the Step coefficient to bring the network closer to the proper variable.\newline
+Additionally, we will also calculate the percent error of the propagation, which will make more sense in training the network\newline
 \begin{algorithm}[H]
-    \caption{Backwards Propagation for a 2-layer neural network}
+    \caption{Backward Propagation for a 2-layer neural network}
     \KwIn{
         $Y^2$ - The input vector (matrix), dimensions $m$ x $1$.\newline
         $W^1_\text{in}$ - The weight matrix, dimensions $h$ x $m$, that represents the weights used as variables go from $Y^2 \rightarrow Y^0$\newline
@@ -114,12 +116,14 @@ This is the heart of the whole lab project, backwards propagation. The goal of b
     }
     \KwOut{
         $W^1$ - The modified weight matrix, describing the same thing as $W^1_\text{in}$\newline
-        $W^0$ - The modified weight matrix, describing the same thing as $W^0_\text{in}$
+        $W^0$ - The modified weight matrix, describing the same thing as $W^0_\text{in}$\newline
+        Err - The \% error of the network
     }
     $W^1 \gets \text{copy of } W^1_\text{in}$\\
     $W^0 \gets \text{copy of } W^0_\text{in}$\\
     $Y^1 \gets \sigma(W^1 \cdot Y^2)$\\
     $Y^0 \gets \sigma(W^0 \cdot Y^1)$\\
+    $\text{Err} \gets | (Y^0_{0,0} - \hat{y}) / \hat{y} |$\\
     \For{$i \gets (0, 1, \ldots, h-1)$}{
         $\Delta W^0 \gets -S \cdot 2 \cdot (Y^0_{0,0} - \hat{y}) \cdot Y^0_{0,0} \cdot (1 - Y^0_{0,0}) \cdot Y^1_{i,0}$\\
         $W^0_{0,i} \gets W^0_{0,i} + \Delta W^0$\\
@@ -127,11 +131,12 @@ This is the heart of the whole lab project, backwards propagation. The goal of b
             $W^1_{i,j} \gets W^1_{i,j} + \Delta W^0 \cdot W^0_{0,i}  \cdot (1 - y^1_{i,0}) \cdot y^2_{j,0}$
         }
     }
-    \Return{$W^1, W^0$}
+    \Return{$W^1, W^0$, Err}
 \end{algorithm}
 
 \subsection{Training the Network}
-To train the network, we are basically going to 
+Now, if you give the same input and expected output into the Backwards Propagation enough times, it's going to give you a network wtih 0\% error for that input. However, it will perform very poorly when tested against a different set of inputs.\newline
+While we do have an abundance of trials that we are able to draw from (67,557 entries to be exact), we could simply run through each and every entry multiple times to get enough data. The question relies in how we manage our Step value, which should be large at first, and as it progresses, gets smaller and smaller.
 
 % Pseudocode, referenced previous algorithms (just include their pseudocode)
 \section{Implementation}
