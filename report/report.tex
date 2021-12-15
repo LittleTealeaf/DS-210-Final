@@ -104,7 +104,7 @@ $$\frac{\delta L}{\delta w^1_{i,j}} = \frac{\delta L}{\delta w^0_{0,i}} \cdot w^
 
 \subsection{Backward Propagation}
 Backward Propagation is the whole accumilation of the previous algorithms to train a neural network. First, the Backward Propagation algorithm calculates the results of the network. After doing so, it calculates the partial derivatives of the loss function in relation to each of the weights (using the Layer Weight Derivatives above). Using these derivatives, it nudges the weights according to the Step coefficient to bring the network closer to the proper variable.\newline
-Additionally, we will also calculate the percent error of the propagation, which will make more sense in training the network\newline
+Additionally, we will also calculate the absolute error of the propagation, which will make more sense in training the network\newline
 \begin{algorithm}[H]
     \caption{Backward Propagation for a 2-layer neural network}
     \KwIn{
@@ -117,13 +117,13 @@ Additionally, we will also calculate the percent error of the propagation, which
     \KwOut{
         $W^1$ - The modified weight matrix, describing the same thing as $W^1_\text{in}$\newline
         $W^0$ - The modified weight matrix, describing the same thing as $W^0_\text{in}$\newline
-        Err - The \% error of the network
+        Err - The absolute error of the network
     }
     $W^1 \gets \text{copy of } W^1_\text{in}$\\
     $W^0 \gets \text{copy of } W^0_\text{in}$\\
     $Y^1 \gets \sigma(W^1 \cdot Y^2)$\\
     $Y^0 \gets \sigma(W^0 \cdot Y^1)$\\
-    $\text{Err} \gets | (Y^0_{0,0} - \hat{y}) / \hat{y} |$\\
+    $\text{Err} \gets | (Y^0_{0,0} - \hat{y}) |$\\
     \For{$i \gets (0, 1, \ldots, h-1)$}{
         $\Delta W^0 \gets -S \cdot 2 \cdot (Y^0_{0,0} - \hat{y}) \cdot Y^0_{0,0} \cdot (1 - Y^0_{0,0}) \cdot Y^1_{i,0}$\\
         $W^0_{0,i} \gets W^0_{0,i} + \Delta W^0$\\
@@ -136,7 +136,7 @@ Additionally, we will also calculate the percent error of the propagation, which
 
 \subsection{Training the Network}
 Now, if you give the same input and expected output into the Backwards Propagation enough times, it's going to give you a network wtih 0\% error for that input. However, it will perform very poorly when tested against a different set of inputs.\newline
-While we do have an abundance of trials that we are able to draw from (67,557 entries to be exact), we could simply run through each and every entry multiple times to get enough data. The question relies in how we manage our Step value, which should be large at first, and as it progresses, gets smaller and smaller.
+While we do have an abundance of trials that we are able to draw from (67,557 entries to be exact), we could simply run through each and every entry multiple times to get enough data. The question relies in how we manage our Step value, which should be large at first, and as it progresses, gets smaller and smaller. This will take some experimentation, but the first idea is to 
 
 % Pseudocode, referenced previous algorithms (just include their pseudocode)
 \section{Implementation}
