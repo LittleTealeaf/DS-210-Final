@@ -1,15 +1,8 @@
 # Data-Science-210-Final
-Stochastic Steepest Descent and Back-propagation Lab
+Stochastic Steepest Descent and Back-propagation Lab. Completed as a final project for Data Science 210, Introduction to Algorithms for Data Science.
 
-## Project Navigation
-- [Project Instructions](FinalProject_Instructions.pdf)
-- [Report PDF](report/report.pdf)
-- [Report Assets](report/assets/README.md)
-- [Datasets](dataset/README.md)
-
-# TODO
-- [ ] Finalize organizing of README files in repository
-- [ ] Work on Report, make sure that link to github is in report
-- [ ] Do hand calculations
-- [ ] Upload hand calculations, etc, etc, etc.
-- [ ] STUFFZ
+### Directory of Files
+- [Report](report/report.pdf)
+- [`lab.py`](src/lab.py)
+- [`data_import.py`](src/data_import.py)
+- [`connect-4-data.csv`](src/resources/connect-4-data.csv)
