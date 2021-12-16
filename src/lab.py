@@ -2,6 +2,10 @@ import numpy as np
 import math
 import random
 from data_import import *
+"""
+Stochastic Descent and Back Propagation Lab
+Author: Thomas Kwashnak
+"""
 
 
 def sigmoid(n):
@@ -18,15 +22,6 @@ def sigmoid(n):
         return a
     else:
         return 1 / (1 + math.exp(-n))
-
-def sigmoid_derivative(n):
-    """Calculates the derivative of the sigmoid function at a given input.
-    Input:
-        n - Either a scalar value, or a single or multidimensional array
-    Output:
-        m - The value of n passed through the derivative of the sigmoid function. If n is an array, then each value within n is passed through the derivative of the sigmoid function
-    """
-    return sigmoid(n) * (1 - sigmoid(n))
 
 def feed_forward(Y,W):
     """Feeds forward the values from a previous layer to the next layer closest to the output layer
@@ -94,7 +89,7 @@ def stochastic_descent(inputs: list,outputs: list,W1: np.matrix,W0: np.matrix,st
     W0 = W0 - DW0 * step / len(inputs)
     return W1, W0, Err_total
 
-def train_network(inputs,outputs,W1_in,W0_in,f_step,iteration_count,batch_size,seed):
+def train_network(inputs,outputs,W1_in,W0_in,f_step,iteration_count,batch_size,seed=None):
     """Trains the neural network on a set of inputs, outputs, and values.
 
     Inputs:
@@ -114,7 +109,8 @@ def train_network(inputs,outputs,W1_in,W0_in,f_step,iteration_count,batch_size,s
     """
     W1 = W1_in
     W0 = W0_in
-    random.seed(seed)
+    if seed:
+        random.seed(seed)
     for i in range(iteration_count):
         step = f_step(i)
         indexes = [random.randint(0,len(inputs)-1) for j in range(batch_size)]
@@ -152,6 +148,9 @@ def random_matrix(size,seed: int=None):
     return np.random.random_sample(size)
 
 def perform_experiment():
+    """
+    Basically, an experimental procedure that I used in order to try to determine optimal settings I could use for my network. The results, as listed in the report, is that 19 nodes in the hidden layer, and a batch size of 3, tend to have the best results.
+    """
     class Experiment:
         """A class that basically stores all the modifyable parameters of a given training, such that they can be tracked. This class is primarily used in running an automated experiment to find the optimal number of nodes in the hidden layer, iterations, and batch size."""
         def __init__(self,inputs,outputs,seed,hidden_count,iterations,batch_size):
@@ -220,7 +219,29 @@ def verification():
     print("Expected Error:",0.2003809377121779)
     print("Found Error:",err)
 
+def train_new_network():
+    """Main method used to train a new network with specified values below. Edit and experiment as needed:"""
+
+    in_data,out_data = get_data_full()
+
+    batch_size = 3
+    hidden_count = 19
+    iterations = 1000000
+    evaluation_interval = 10000
+
+    W1 = random_matrix((hidden_count,42),12)
+    W0 = random_matrix((1,hidden_count),423)
+
+    for i in range(iterations // evaluation_interval):
+        W1,W0 = train_network(in_data,out_data,W1,W0,lambda n: 1.0 - (n + i * evaluation_interval) / iterations,evaluation_interval,batch_size)
+        print("Evaluation at : ",(i * evaluation_interval),"Average Absolute Error:",evaluate_network(in_data,out_data,W1,W0))
+
+    
 
 
 if __name__ == "__main__":
-    perform_experiment()
+    print("Author: Thomas Kwashnak")
+    # perform_experiment()
+    # verification()
+    train_new_network()
+    

@@ -240,7 +240,33 @@ Now, in order to train the network, I need to send in batches of data for it to 
 Implementing the algorithms was mostly straight-forward. The only caveat came with data importing, which is described below.
 \subsection{Data Importing}
 Since the data was given in a .csv file type, with strings instead of numbers, another python script was created in order to convert the data into something the network could use. The file \path{data_import.py} contains the code responsbile for importing the data for the data and converting the string values into numbers for the network to perform.
-% Reference methods / describe code?
+\subsection{Experimentation with Network configuration}
+With the algorithms implemented, there are a lot of knobs to turn to get a good network. Since I had no idea where to begin, I decided to code up a little "experiment" that goes through and tests every combination (within the ranges I wanted it to test). While it's not an important algorithm, per se, it was useful in figuring out what values had the best effects on a network.\par
+The experiment tests different hidden-layer node counts, batch sizes, and total number of iterations. While the total number of iterations actually doesn't say much, I left it in there because I was already running the experiment. The experiment would then create a neural network, from the same seed for each instance, and run through the network training with the given parameters. Once it was done training, the experiment compares that trial's overall "effectiveness", or the average absolute difference across all given data entries, with that of the current best network.\par
+Below is the list of "best" configurations found (from the first time it found a best to the current latest best):\par
+\begin{tabular}{|c|c|c|l|}
+    \hline
+    Iterations & Batch Size & Hidden Layer Count & Average Absolute Error\\
+    \hline
+    \hline
+    $1000$ & $18$ & $2$ & $0.33132633102530734$\\
+    $1000 $& $19$ & $2 $& $0.320365862903236$\\
+    $1000$ & $15$ & $3$ &  $0.3190037786988049$\\
+    $1000$ & $16$ & $3$ & $0.31688696576565145$\\
+    $1000$ & $12$ & $5$ & $0.31665647698911803$\\
+    $1000$ & $3$ & $6$ & $ 0.3137002086893281$\\
+    $1000$ & $3$ & $8$ & $ 0.31244657980713675$\\
+    $1000$ & $3$ & $9$ & $0.3112456332209049$\\
+    $1000$ & $5$ & $11$ & $0.31047348272774256$\\
+    $1000$ & $3$ & $12$ & $0.30996242881889713$\\
+    $1000$ & $3$ & $13$ & $ 0.30986743631613556$\\
+    $1000$ & $3$ & $14$ & $0.3098280038746314$\\
+    $1000$ & $3$ & $15$ & $ 0.3077584585210811$\\
+    $1000$ & $3$ & $18$ & $ 0.3076321558781285$\\
+    $1000$ & $3$ & $19$ & $0.30552294533373886$\\
+    \hline
+\end{tabular}\par
+One of the noticable trends that we see is that a batch size of 3 is one of the most common ones. Additionally, the experiment ran up to 28 nodes, and has still not yet beaten the 19-node network's record. As a result of this, I will conclude that the best network, at least with only 1000 iterations, is with 19 nodes in the hidden layer, and 3 entries per batch. These are the values that I will be using in training my network.
 \newpage
 \section{Validation}
 Since the algorithms were made to be dynamic, and the provided dataset is so large, I will instead be using smaller matrices in order to verify that our algorithms work. I will verify the algorithms that we implemented with drawn-out steps describing the math happening on the back end.
@@ -308,4 +334,10 @@ These calculations resulted to being consistent with those found from calling th
 
 
 \section{Reflection}
+This project was a lot of fun. While I did stress myself out cramming it in with the last couple of days, I think I'm actually starting to understand neural networks a lot more with this hands on experience. Additionally, I think my algorithm works, it just might need a lot more time than I have to learn. With that being said, there are a few improvements that I think would greatly help this experiment\par
+Firstly, Since we simplified the forward propagation down to matrix multiplication, I'm sure that much of this can be calculated using a GPU. Additionally, maybe not running this on a subsystem on my windows desktop was the best idea either. Using the proper hardware meant for doing these kinds of tasks would grealy improve the speed that my algorithm runs at.\par
+Secondly, there's one thing that I know I can talk a lot about. Multithreading. I think one of the more simpler ways I could improve this algorithm is by utilising all of the logical cores on my system. My desktop, the one that has been running this experiment, has a total of 12 logical cores, but only used 1 when it ran the experiment. This kind of stuff I do have experience with, and rather recent experience at that.\newline
+A few weeks before doing this experiment, I was in a group working on a Computer Science experiment for our Algorithms class. This experiment tested the limits of multiplying big integers using different implementations of Java's BigInteger class. As a group, we managed to misread the instructions, and fell into the belief that we had to have $5000$ tests \textit{per digit count}, which went up to $500000$ digits. Therefore, in order to optimize the time it took for our experiment to complete, I implemented (multiple times) a thread-manager that would divide up the calculations needed among each of the logical cores, effectively cutting the time down depending on the number of cores the system had.\newline
+A similar approach could be taken for this lab. When calculating each batch, one could simply create threads that go off on their separate ways to calculate the changes for each entry, and then bringing it together at the end to modify the weights. Additionally, with my mini-experiment to try and find effective parameters for the network, multithreading would also greatly reduce the time it took to get to some of those higher numbers.\par
+I'm sure there are many more ways to improve this experiment. The one hinderance on the speed of the implemented algorithm is that it is not effectively using \textit{all} of the system resources at its disposal. 
 \end{document}
