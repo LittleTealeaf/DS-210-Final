@@ -24,6 +24,9 @@
 \tableofcontents
 \newpage
 
+\section{Pramble}
+The full repository of this project can be found at \url{https://github.com/LittleTealeaf/Data-Science-210-Final}
+
 % These sections are good for a start, however change them up as needed
 \section{Background}
 \subsection{Goals}
@@ -339,5 +342,5 @@ Firstly, Since we simplified the forward propagation down to matrix multiplicati
 Secondly, there's one thing that I know I can talk a lot about. Multithreading. I think one of the more simpler ways I could improve this algorithm is by utilising all of the logical cores on my system. My desktop, the one that has been running this experiment, has a total of 12 logical cores, but only used 1 when it ran the experiment. This kind of stuff I do have experience with, and rather recent experience at that.\newline
 A few weeks before doing this experiment, I was in a group working on a Computer Science experiment for our Algorithms class. This experiment tested the limits of multiplying big integers using different implementations of Java's BigInteger class. As a group, we managed to misread the instructions, and fell into the belief that we had to have $5000$ tests \textit{per digit count}, which went up to $500000$ digits. Therefore, in order to optimize the time it took for our experiment to complete, I implemented (multiple times) a thread-manager that would divide up the calculations needed among each of the logical cores, effectively cutting the time down depending on the number of cores the system had.\newline
 A similar approach could be taken for this lab. When calculating each batch, one could simply create threads that go off on their separate ways to calculate the changes for each entry, and then bringing it together at the end to modify the weights. Additionally, with my mini-experiment to try and find effective parameters for the network, multithreading would also greatly reduce the time it took to get to some of those higher numbers.\par
-I'm sure there are many more ways to improve this experiment. The one hinderance on the speed of the implemented algorithm is that it is not effectively using \textit{all} of the system resources at its disposal. 
+I'm sure there are many more ways to improve this experiment. The main hinderance on the speed of the implemented algorithm is that it is not effectively using \textit{all} of the system resources at its disposal. 
 \end{document}
