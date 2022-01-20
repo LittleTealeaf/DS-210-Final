@@ -1,4 +1,4 @@
-# Data-Science-210-Final
+# DS-210 Final
 Stochastic Steepest Descent and Back-propagation Lab. Completed as a final project for Data Science 210, Introduction to Algorithms for Data Science.
 
 ### Directory of Files
