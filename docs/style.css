@@ -1,0 +1,15 @@
+iframe {
+    width: 100%;
+    height: 100vh;
+    border-width: 0px;
+}
+
+* {
+    background-color: #3b3b3b;
+    margin: 0px;
+    padding: 0px;
+}
+
+html::-webkit-scrollbar {
+    display: none;
+}

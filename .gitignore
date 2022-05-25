@@ -149,3 +149,12 @@ report/report.run.xml
 report/report.synctex.gz
 report/report.toc
 report/report.out
+
+docs/*.pdf
+
+
+docs/assets/
+tmp/
+
+*.out
+*.toc

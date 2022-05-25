@@ -1,0 +1,24 @@
+name: Publish Documentation
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout Repository
+      uses: actions/checkout@v3
+    - name: Install Latex
+      run: sudo apt install texlive-full -y
+    - name: Run Latex on Report
+      run: |
+        pdflatex report/report.tex
+        mv report.pdf docs
+    - name: Publish to GitHub Pages
+      uses: peaceiris/actions-gh-pages@v3
+      with:
+        github_token: ${{secrets.GITHUB_TOKEN}}
+        publish_dir: ./docs/
