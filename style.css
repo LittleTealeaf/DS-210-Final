@@ -24,16 +24,17 @@ html::-webkit-scrollbar {
     box-shadow: 0px 0px 20px 20px rgba(0,0,0,0.5);
 }
 
-#description a {
+#description p a {
     color: #698fdb;
 }
-#description a:visited {
+#description p a:visited {
     color: #91a4c9;
 }
 
 .button {
     margin: 50px auto;
     width: fit-content;
+    color: white;
 }
 
 .button a {
@@ -43,8 +44,12 @@ html::-webkit-scrollbar {
     padding: 10px;
     border-radius: 20px;
     cursor: pointer;
-    box-shadow: 0px 0px 30px 30px rgba(0,0,0,0.5);
+    box-shadow: 0px 0px 20px 10px rgba(0,0,0,0.5);
     text-decoration: none;
+    color: white;
+}
+
+.button a:visited {
     color: white;
 }
 
